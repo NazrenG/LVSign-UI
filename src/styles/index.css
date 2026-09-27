@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens — single source of truth for colours & typography.
+ * Tailwind v4 turns every --color-* / --font-* into utilities
+ * (e.g. bg-canvas, text-ink-muted, font-serif).
+ */
+@theme {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', ui-serif, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-canvas: #f4f4f2;
+  --color-canvas-muted: #ecece8;
+  --color-surface: #ffffff;
+  --color-line: #dcdcd7;
+  --color-line-strong: #b9b9b3;
+
+  --color-ink: #1d1d1b;
+  --color-ink-muted: #5d5d58;
+  --color-ink-subtle: #8a8a84;
+
+  --color-brand: #e1261c;
+  --color-primary: #233d8c;
+  --color-primary-hover: #1b3076;
+  --color-primary-soft: #e5e9f7;
+
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fcf0d3;
+  --color-success: #1d6b4f;
+  --color-success-soft: #e1f1ea;
+  --color-danger: #b42318;
+  --color-danger-soft: #fde7e4;
+  --color-neutral-soft: #ececea;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+  }
+}
