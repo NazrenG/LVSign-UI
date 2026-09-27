@@ -1,1 +1,1 @@
-export const DEPARTMENTS = ['Staff', 'HR', 'Finance', 'Admin'];
+export const DEPARTMENTS = ["Staff", "System Developer", "Finance", "Admin"];

@@ -1,7 +1,7 @@
-import { DEPARTMENTS } from '@/constants/departments';
-import { cn } from '@/utils/cn';
+import { DEPARTMENTS } from "@/constants/departments";
+import { cn } from "@/utils/cn";
 
-/** Segmented control: Staff | HR | Finance | Admin */
+/** Segmented control: Staff | System Developer | Finance | Admin */
 export function DepartmentPicker({ value, onChange }) {
   return (
     <fieldset>
@@ -16,10 +16,10 @@ export function DepartmentPicker({ value, onChange }) {
               aria-pressed={isSelected}
               onClick={() => onChange(department)}
               className={cn(
-                'h-11 rounded-sm border text-[15px] font-medium transition-colors',
+                "h-11 rounded-sm border text-[15px] font-medium transition-colors",
                 isSelected
-                  ? 'border-primary bg-primary-soft text-primary'
-                  : 'border-line-strong bg-surface text-ink hover:bg-canvas',
+                  ? "border-primary bg-primary-soft text-primary"
+                  : "border-line-strong bg-surface text-ink hover:bg-canvas",
               )}
             >
               {department}

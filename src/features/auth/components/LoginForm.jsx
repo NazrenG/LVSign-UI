@@ -1,13 +1,18 @@
-import { useState } from 'react';
-import { Button, Card, Input } from '@/components/ui';
-import { DepartmentPicker } from './DepartmentPicker';
+import { useState } from "react";
+import { Button, Card, Input } from "@/components/ui";
+import { DepartmentPicker } from "./DepartmentPicker";
 
-const INITIAL_VALUES = { department: 'HR', email: '', password: '' };
+const INITIAL_VALUES = {
+  department: "System Developer",
+  email: "",
+  password: "",
+};
 
 export function LoginForm({ onSubmit }) {
   const [values, setValues] = useState(INITIAL_VALUES);
 
-  const setField = (field) => (value) => setValues((current) => ({ ...current, [field]: value }));
+  const setField = (field) => (value) =>
+    setValues((current) => ({ ...current, [field]: value }));
   const handleInput = (field) => (event) => setField(field)(event.target.value);
 
   const handleSubmit = (event) => {
@@ -17,14 +22,17 @@ export function LoginForm({ onSubmit }) {
 
   return (
     <Card as="form" onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-7">
-      <DepartmentPicker value={values.department} onChange={setField('department')} />
+      <DepartmentPicker
+        value={values.department}
+        onChange={setField("department")}
+      />
       <Input
         label="Work email"
         type="email"
         autoComplete="username"
         placeholder="name.surname@company"
         value={values.email}
-        onChange={handleInput('email')}
+        onChange={handleInput("email")}
         required
       />
       <Input
@@ -33,7 +41,7 @@ export function LoginForm({ onSubmit }) {
         autoComplete="current-password"
         placeholder="Your network password"
         value={values.password}
-        onChange={handleInput('password')}
+        onChange={handleInput("password")}
         required
       />
       <Button type="submit" size="lg" fullWidth className="mt-2">
