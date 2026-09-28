@@ -33,3 +33,12 @@ export const STATUS_TABS = [
     label: STATUS_META[value].label,
   })),
 ];
+
+/** Maps a signer state onto the generic step state used by shared steppers. */
+export const SIGNER_STEP_STATE = {
+  [SIGNER_STATE.SIGNED]: "done",
+  [SIGNER_STATE.CURRENT]: "current",
+  [SIGNER_STATE.PENDING]: "pending",
+  [SIGNER_STATE.NOT_SENT]: "pending",
+  [SIGNER_STATE.DECLINED]: "danger",
+};

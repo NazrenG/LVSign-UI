@@ -27,8 +27,9 @@ export const PEOPLE = {
   am: {
     id: "am",
     name: "Aysel Mammadova",
-    department: "Operations",
+    department: "Operations — Koroglu Depot",
     title: "Employee",
+    managerId: "fa",
   },
   rm: {
     id: "rm",

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { PageHeader } from "@/components/layout";
-import { SearchInput, SectionHeading } from "@/components/ui";
+import { SearchInput, SectionHeading, StatGroup } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { AGREEMENTS } from "@/data/agreements";
 import { CURRENT_USER } from "@/data/people";
@@ -13,7 +13,7 @@ import {
 import { QuickActions } from "@/features/dashboard/components/QuickActions";
 import { RecentlyCompletedList } from "@/features/dashboard/components/RecentlyCompletedList";
 import { SentByYouList } from "@/features/dashboard/components/SentByYouList";
-import { StatsSummary } from "@/features/dashboard/components/StatsSummary";
+
 import { WaitingForYouCard } from "@/features/dashboard/components/WaitingForYouCard";
 import {
   formatLongDate,
@@ -50,7 +50,7 @@ export function HomePage() {
           waitingCount={waitingForYou.length}
           firstWaitingId={waitingForYou[0]?.id}
         />
-        <StatsSummary
+        <StatGroup
           stats={getDashboardStats(AGREEMENTS, CURRENT_USER.id, today)}
         />
 

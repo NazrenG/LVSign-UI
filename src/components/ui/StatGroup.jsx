@@ -1,12 +1,16 @@
 import { cn } from "@/utils/cn";
 
 /**
- * Row of big numbers: 1 Waiting for you | 1 Waiting for others | ...
- * 2 columns on mobile, 4 on tablet+; dividers follow the column layout.
+ * Row of big serif numbers with labels, separated by dividers.
+ * 2 columns on mobile, 4 on tablet+.
+ * stats: [{ label, value }]
  */
-export function StatsSummary({ stats }) {
+export function StatGroup({ stats, className }) {
   return (
-    <section aria-label="Summary" className="border-y border-line py-6">
+    <section
+      aria-label="Summary"
+      className={cn("border-y border-line py-6", className)}
+    >
       <dl className="grid grid-cols-2 gap-y-6 md:grid-cols-4">
         {stats.map(({ label, value }, index) => (
           <div

@@ -27,7 +27,16 @@ const WEEKDAYS = [
   "Saturday",
 ];
 
-const toDate = (value) => (value instanceof Date ? value : new Date(value));
+/**
+ * Parses a Date, an ISO date-time, or a date-only string ("2026-10-06").
+ * Date-only strings are read as local midnight — `new Date("2026-10-06")`
+ * would be UTC midnight and can land on the previous day west of UTC.
+ */
+export function toDate(value) {
+  if (value instanceof Date) return value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return new Date(`${value}T00:00`);
+  return new Date(value);
+}
 const short = (name) => name.slice(0, 3);
 const pad = (number) => String(number).padStart(2, "0");
 
@@ -87,3 +96,9 @@ export const getInitials = (fullName) =>
 /** pluralize(1, 'document') -> "1 document", pluralize(2, 'document') -> "2 documents" */
 export const pluralize = (count, word) =>
   `${count} ${word}${count === 1 ? "" : "s"}`;
+
+/** "02 Sep 2026" */
+export function formatDayMonthYear(value) {
+  const date = toDate(value);
+  return `${pad(date.getDate())} ${short(MONTHS[date.getMonth()])} ${date.getFullYear()}`;
+}

@@ -16,7 +16,9 @@ export function PageHeader({ title, subtitle, actions, className }) {
         )}
       </div>
       {actions && (
-        <div className="flex flex-wrap items-center gap-3">{actions}</div>
+        <div className="flex flex-wrap items-center gap-3 xl:shrink-0 xl:flex-nowrap">
+          {actions}
+        </div>
       )}
     </header>
   );

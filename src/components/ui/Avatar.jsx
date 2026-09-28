@@ -15,7 +15,14 @@ const VARIANTS = {
   soft: "bg-canvas-muted text-ink border-line",
 };
 
-export function Avatar({ name, size = "md", variant = "soft", className }) {
+/** Circle with initials. Pass `initials` to override the ones derived from `name` (e.g. role codes). */
+export function Avatar({
+  name,
+  initials,
+  size = "md",
+  variant = "soft",
+  className,
+}) {
   return (
     <span
       title={name}
@@ -26,7 +33,7 @@ export function Avatar({ name, size = "md", variant = "soft", className }) {
         className,
       )}
     >
-      {getInitials(name)}
+      {initials ?? getInitials(name)}
     </span>
   );
 }
