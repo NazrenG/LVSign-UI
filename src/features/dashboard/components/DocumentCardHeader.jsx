@@ -1,4 +1,4 @@
-import { StatusBadge } from '@/features/agreements';
+import { StatusBadge } from "@/features/agreements";
 
 /** Serif title + status badge + one-line meta. Shared by all dashboard cards. */
 export function DocumentCardHeader({ agreement, meta }) {

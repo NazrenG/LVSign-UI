@@ -1,17 +1,21 @@
-import { Bell, Download, X } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { formatDueDate } from '@/utils/formatters';
-import { AGREEMENT_STATUS } from '../agreementStatus';
-import { getPerson, getReminderLabel } from '../agreementSelectors';
-import { ActivityHistory } from './ActivityHistory';
-import { SigningTimeline } from './SigningTimeline';
-import { StatusBadge } from './StatusBadge';
+import { Bell, Download, X } from "lucide-react";
+import { Button } from "@/components/ui";
+import { formatDueDate } from "@/utils/formatters";
+import { AGREEMENT_STATUS } from "../agreementStatus";
+import { getPerson, getReminderLabel } from "../agreementSelectors";
+import { ActivityHistory } from "./ActivityHistory";
+import { SigningTimeline } from "./SigningTimeline";
+import { StatusBadge } from "./StatusBadge";
 
 function DetailItem({ label, children, mono = false }) {
   return (
     <div>
       <dt className="text-sm text-ink-muted">{label}</dt>
-      <dd className={mono ? 'mt-1 font-mono text-sm text-ink' : 'mt-1 text-ink'}>{children}</dd>
+      <dd
+        className={mono ? "mt-1 font-mono text-sm text-ink" : "mt-1 text-ink"}
+      >
+        {children}
+      </dd>
     </div>
   );
 }
@@ -38,8 +42,12 @@ export function AgreementDetailPanel({ agreement, onClose }) {
       </header>
 
       <dl className="grid grid-cols-2 gap-4 border-b border-line pb-6">
-        <DetailItem label="Sent by">{getPerson(agreement.senderId).name}</DetailItem>
-        <DetailItem label="Due">{agreement.dueAt ? formatDueDate(agreement.dueAt) : '—'}</DetailItem>
+        <DetailItem label="Sent by">
+          {getPerson(agreement.senderId).name}
+        </DetailItem>
+        <DetailItem label="Due">
+          {agreement.dueAt ? formatDueDate(agreement.dueAt) : "—"}
+        </DetailItem>
         <DetailItem label="Pages">{agreement.pages}</DetailItem>
         <DetailItem label="Document ID" mono>
           {agreement.documentId}

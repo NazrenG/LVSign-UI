@@ -1,5 +1,5 @@
-import { Menu } from 'lucide-react';
-import { Logo } from '@/components/ui';
+import { Menu } from "lucide-react";
+import { Logo } from "@/components/ui";
 
 /** Top bar shown below the lg breakpoint, where the sidebar is hidden. */
 export function MobileHeader({ onMenuClick }) {

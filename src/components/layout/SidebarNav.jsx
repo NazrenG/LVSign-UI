@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom';
-import { MAIN_NAVIGATION } from '@/constants/navigation';
-import { cn } from '@/utils/cn';
+import { NavLink } from "react-router-dom";
+import { MAIN_NAVIGATION } from "@/constants/navigation";
+import { cn } from "@/utils/cn";
 
 export function SidebarNav({ onNavigate }) {
   return (
@@ -14,10 +14,10 @@ export function SidebarNav({ onNavigate }) {
               onClick={onNavigate}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3.5 rounded-md border px-4 py-2.5 text-[15px] font-medium transition-colors',
+                  "flex items-center gap-3.5 rounded-md border px-4 py-2.5 text-[15px] font-medium transition-colors",
                   isActive
-                    ? 'border-line bg-surface text-primary shadow-xs'
-                    : 'border-transparent text-ink hover:bg-canvas-muted',
+                    ? "border-line bg-surface text-primary shadow-xs"
+                    : "border-transparent text-ink hover:bg-canvas-muted",
                 )
               }
             >

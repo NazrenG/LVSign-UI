@@ -1,11 +1,11 @@
-import { cn } from '@/utils/cn';
+import { cn } from "@/utils/cn";
 
 /** Small square tile holding an icon (quick-action cards, empty states). */
 export function IconTile({ icon: Icon, className }) {
   return (
     <span
       className={cn(
-        'inline-flex size-12 items-center justify-center rounded-md border border-line bg-canvas',
+        "inline-flex size-12 items-center justify-center rounded-md border border-line bg-canvas",
         className,
       )}
     >

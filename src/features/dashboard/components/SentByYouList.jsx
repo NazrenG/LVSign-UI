@@ -1,25 +1,30 @@
-import { Bell } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button, Card } from '@/components/ui';
-import { ROUTES } from '@/constants/routes';
+import { Bell } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button, Card } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
 import {
   AGREEMENT_STATUS,
   SigningProgress,
   getReminderLabel,
   getWaitingSummary,
-} from '@/features/agreements';
-import { formatDueDate } from '@/utils/formatters';
-import { DocumentCardHeader } from './DocumentCardHeader';
+} from "@/features/agreements";
+import { formatDueDate } from "@/utils/formatters";
+import { DocumentCardHeader } from "./DocumentCardHeader";
 
 function getMeta(agreement) {
-  if (agreement.status === AGREEMENT_STATUS.DRAFT) return `Draft · ${agreement.draftNote}`;
+  if (agreement.status === AGREEMENT_STATUS.DRAFT)
+    return `Draft · ${agreement.draftNote}`;
   return `${getWaitingSummary(agreement)} · Due ${formatDueDate(agreement.dueAt)}`;
 }
 
 function SentItemActions({ agreement }) {
   if (agreement.status === AGREEMENT_STATUS.DRAFT) {
     return (
-      <Button as={Link} to={ROUTES.editDocument(agreement.id)} variant="secondary">
+      <Button
+        as={Link}
+        to={ROUTES.editDocument(agreement.id)}
+        variant="secondary"
+      >
         Continue preparing
       </Button>
     );
@@ -30,7 +35,11 @@ function SentItemActions({ agreement }) {
       <Button variant="ghost" icon={Bell}>
         {getReminderLabel(agreement)}
       </Button>
-      <Button as={Link} to={`${ROUTES.agreements}?selected=${agreement.id}`} variant="secondary">
+      <Button
+        as={Link}
+        to={`${ROUTES.agreements}?selected=${agreement.id}`}
+        variant="secondary"
+      >
         View details
       </Button>
     </>

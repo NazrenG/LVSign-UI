@@ -1,14 +1,18 @@
-import { Card } from '@/components/ui';
-import { cn } from '@/utils/cn';
-import { formatDateTime } from '@/utils/formatters';
-import { getPerson } from '../agreementSelectors';
-import { SignerChain } from './SignerChain';
-import { StatusBadge } from './StatusBadge';
+import { Card } from "@/components/ui";
+import { cn } from "@/utils/cn";
+import { formatDateTime } from "@/utils/formatters";
+import { getPerson } from "../agreementSelectors";
+import { SignerChain } from "./SignerChain";
+import { StatusBadge } from "./StatusBadge";
 
-const COLUMNS = ['Document', 'Sender', 'Signing route', 'Status', 'Updated'];
+const COLUMNS = ["Document", "Sender", "Signing route", "Status", "Updated"];
 
 function EmptyState() {
-  return <p className="px-6 py-12 text-center text-ink-muted">No documents match this filter.</p>;
+  return (
+    <p className="px-6 py-12 text-center text-ink-muted">
+      No documents match this filter.
+    </p>
+  );
 }
 
 /** Desktop / tablet: a real <table>. */
@@ -31,12 +35,18 @@ function TableView({ agreements, selectedId, onSelect }) {
             onClick={() => onSelect(agreement.id)}
             aria-selected={agreement.id === selectedId}
             className={cn(
-              'cursor-pointer transition-colors',
-              agreement.id === selectedId ? 'bg-primary-soft' : 'hover:bg-canvas',
+              "cursor-pointer transition-colors",
+              agreement.id === selectedId
+                ? "bg-primary-soft"
+                : "hover:bg-canvas",
             )}
           >
-            <td className="min-w-52 px-4 py-4 font-medium text-ink">{agreement.title}</td>
-            <td className="min-w-36 px-4 py-4 text-ink-muted">{getPerson(agreement.senderId).name}</td>
+            <td className="min-w-52 px-4 py-4 font-medium text-ink">
+              {agreement.title}
+            </td>
+            <td className="min-w-36 px-4 py-4 text-ink-muted">
+              {getPerson(agreement.senderId).name}
+            </td>
             <td className="px-4 py-4">
               <SignerChain agreement={agreement} />
             </td>
@@ -63,8 +73,8 @@ function ListView({ agreements, selectedId, onSelect }) {
             type="button"
             onClick={() => onSelect(agreement.id)}
             className={cn(
-              'w-full space-y-3 px-4 py-4 text-left',
-              agreement.id === selectedId && 'bg-primary-soft',
+              "w-full space-y-3 px-4 py-4 text-left",
+              agreement.id === selectedId && "bg-primary-soft",
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -73,7 +83,9 @@ function ListView({ agreements, selectedId, onSelect }) {
             </div>
             <div className="flex items-center justify-between gap-3">
               <SignerChain agreement={agreement} />
-              <span className="font-mono text-xs text-ink-muted">{formatDateTime(agreement.updatedAt)}</span>
+              <span className="font-mono text-xs text-ink-muted">
+                {formatDateTime(agreement.updatedAt)}
+              </span>
             </div>
           </button>
         </li>

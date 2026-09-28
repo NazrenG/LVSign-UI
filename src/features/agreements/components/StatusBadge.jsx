@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui';
-import { STATUS_META } from '../agreementStatus';
-import { getStatusLabel } from '../agreementSelectors';
+import { Badge } from "@/components/ui";
+import { STATUS_META } from "../agreementStatus";
+import { getStatusLabel } from "../agreementSelectors";
 
 export function StatusBadge({ agreement, className }) {
   return (

@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from "@/utils/cn";
 
 /**
  * Row of big numbers: 1 Waiting for you | 1 Waiting for others | ...
@@ -12,9 +12,9 @@ export function StatsSummary({ stats }) {
           <div
             key={label}
             className={cn(
-              'flex flex-col-reverse justify-end',
-              index % 2 === 1 && 'border-l border-line pl-5',
-              index > 0 && 'md:border-l md:border-line md:pl-7',
+              "flex flex-col-reverse justify-end",
+              index % 2 === 1 && "border-l border-line pl-5",
+              index > 0 && "md:border-l md:border-line md:pl-7",
             )}
           >
             <dt className="mt-2 text-[15px] text-ink-muted">{label}</dt>

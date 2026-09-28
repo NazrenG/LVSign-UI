@@ -1,8 +1,8 @@
-import { cn } from '@/utils/cn';
-import { formatDateTime } from '@/utils/formatters';
-import { AGREEMENT_STATUS, SIGNER_STATE } from '../agreementStatus';
-import { getPerson } from '../agreementSelectors';
-import { CompletionMarker, SignerMarker } from './StepMarker';
+import { cn } from "@/utils/cn";
+import { formatDateTime } from "@/utils/formatters";
+import { AGREEMENT_STATUS, SIGNER_STATE } from "../agreementStatus";
+import { getPerson } from "../agreementSelectors";
+import { CompletionMarker, SignerMarker } from "./StepMarker";
 
 function getTimelineCaption(signer) {
   switch (signer.state) {
@@ -13,9 +13,9 @@ function getTimelineCaption(signer) {
     case SIGNER_STATE.DECLINED:
       return `Declined ${formatDateTime(signer.date)}`;
     case SIGNER_STATE.NOT_SENT:
-      return 'Not sent';
+      return "Not sent";
     default:
-      return 'Not yet';
+      return "Not yet";
   }
 }
 
@@ -32,7 +32,10 @@ export function SigningTimeline({ agreement }) {
           <li key={signer.personId} className="relative flex gap-3 pb-5">
             <span
               aria-hidden
-              className={cn('absolute top-4 bottom-0 left-[7px] w-0.5', isSigned ? 'bg-ink' : 'bg-line')}
+              className={cn(
+                "absolute top-4 bottom-0 left-[7px] w-0.5",
+                isSigned ? "bg-ink" : "bg-line",
+              )}
             />
             <span className="pt-0.5">
               <SignerMarker state={signer.state} />
@@ -40,14 +43,18 @@ export function SigningTimeline({ agreement }) {
             <div className="min-w-0">
               <p
                 className={cn(
-                  'text-[15px] font-medium',
-                  signer.state === SIGNER_STATE.CURRENT ? 'text-primary' : 'text-ink',
+                  "text-[15px] font-medium",
+                  signer.state === SIGNER_STATE.CURRENT
+                    ? "text-primary"
+                    : "text-ink",
                 )}
               >
                 {person.name}
               </p>
               <p className="text-[13px] text-ink-muted">{person.title}</p>
-              <p className="font-mono text-[13px] text-ink-muted">{getTimelineCaption(signer)}</p>
+              <p className="font-mono text-[13px] text-ink-muted">
+                {getTimelineCaption(signer)}
+              </p>
             </div>
           </li>
         );

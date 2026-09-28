@@ -1,15 +1,15 @@
-import { Avatar } from '@/components/ui';
-import { cn } from '@/utils/cn';
-import { AGREEMENT_STATUS, SIGNER_STATE } from '../agreementStatus';
-import { getPerson } from '../agreementSelectors';
-import { CompletionMarker } from './StepMarker';
+import { Avatar } from "@/components/ui";
+import { cn } from "@/utils/cn";
+import { AGREEMENT_STATUS, SIGNER_STATE } from "../agreementStatus";
+import { getPerson } from "../agreementSelectors";
+import { CompletionMarker } from "./StepMarker";
 
 const AVATAR_VARIANT = {
-  [SIGNER_STATE.SIGNED]: 'filled',
-  [SIGNER_STATE.CURRENT]: 'active',
-  [SIGNER_STATE.PENDING]: 'outline',
-  [SIGNER_STATE.NOT_SENT]: 'outline',
-  [SIGNER_STATE.DECLINED]: 'danger',
+  [SIGNER_STATE.SIGNED]: "filled",
+  [SIGNER_STATE.CURRENT]: "active",
+  [SIGNER_STATE.PENDING]: "outline",
+  [SIGNER_STATE.NOT_SENT]: "outline",
+  [SIGNER_STATE.DECLINED]: "danger",
 };
 
 /** Statuses whose route never reaches a "Completed" end. */
@@ -22,13 +22,17 @@ export function SignerChain({ agreement, className }) {
   const showEnd = !TERMINATED.includes(agreement.status);
 
   return (
-    <div className={cn('flex items-center', className)}>
+    <div className={cn("flex items-center", className)}>
       {agreement.signers.map((signer, index) => {
         const { name } = getPerson(signer.personId);
         return (
           <span key={signer.personId} className="flex items-center">
             {index > 0 && <Connector />}
-            <Avatar name={name} size="sm" variant={AVATAR_VARIANT[signer.state]} />
+            <Avatar
+              name={name}
+              size="sm"
+              variant={AVATAR_VARIANT[signer.state]}
+            />
           </span>
         );
       })}

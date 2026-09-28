@@ -1,7 +1,7 @@
-import { LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Avatar } from '@/components/ui';
-import { ROUTES } from '@/constants/routes';
+import { LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Avatar } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
 
 export function SidebarUserCard({ user }) {
   return (

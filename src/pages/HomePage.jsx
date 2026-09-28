@@ -1,21 +1,26 @@
-import { Link } from 'react-router-dom';
-import { PageHeader } from '@/components/layout';
-import { SearchInput, SectionHeading } from '@/components/ui';
-import { ROUTES } from '@/constants/routes';
-import { AGREEMENTS } from '@/data/agreements';
-import { CURRENT_USER } from '@/data/people';
+import { Link } from "react-router-dom";
+import { PageHeader } from "@/components/layout";
+import { SearchInput, SectionHeading } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
+import { AGREEMENTS } from "@/data/agreements";
+import { CURRENT_USER } from "@/data/people";
 import {
   getDashboardStats,
   getRecentlyCompleted,
   getSentByUser,
   getWaitingForUser,
-} from '@/features/agreements';
-import { QuickActions } from '@/features/dashboard/components/QuickActions';
-import { RecentlyCompletedList } from '@/features/dashboard/components/RecentlyCompletedList';
-import { SentByYouList } from '@/features/dashboard/components/SentByYouList';
-import { StatsSummary } from '@/features/dashboard/components/StatsSummary';
-import { WaitingForYouCard } from '@/features/dashboard/components/WaitingForYouCard';
-import { formatLongDate, getFirstName, getGreeting, pluralize } from '@/utils/formatters';
+} from "@/features/agreements";
+import { QuickActions } from "@/features/dashboard/components/QuickActions";
+import { RecentlyCompletedList } from "@/features/dashboard/components/RecentlyCompletedList";
+import { SentByYouList } from "@/features/dashboard/components/SentByYouList";
+import { StatsSummary } from "@/features/dashboard/components/StatsSummary";
+import { WaitingForYouCard } from "@/features/dashboard/components/WaitingForYouCard";
+import {
+  formatLongDate,
+  getFirstName,
+  getGreeting,
+  pluralize,
+} from "@/utils/formatters";
 
 export function HomePage() {
   const today = new Date();
@@ -24,7 +29,7 @@ export function HomePage() {
   const recentlyCompleted = getRecentlyCompleted(AGREEMENTS, 2);
 
   const subtitle = waitingForYou.length
-    ? `${formatLongDate(today)} · ${pluralize(waitingForYou.length, 'document')} ${waitingForYou.length === 1 ? 'needs' : 'need'} your signature`
+    ? `${formatLongDate(today)} · ${pluralize(waitingForYou.length, "document")} ${waitingForYou.length === 1 ? "needs" : "need"} your signature`
     : formatLongDate(today);
 
   return (
@@ -32,12 +37,22 @@ export function HomePage() {
       <PageHeader
         title={`${getGreeting(today)}, ${getFirstName(CURRENT_USER.name)}`}
         subtitle={subtitle}
-        actions={<SearchInput placeholder="Search documents and people" className="w-full md:w-96" />}
+        actions={
+          <SearchInput
+            placeholder="Search documents and people"
+            className="w-full md:w-96"
+          />
+        }
       />
 
       <div className="space-y-7">
-        <QuickActions waitingCount={waitingForYou.length} firstWaitingId={waitingForYou[0]?.id} />
-        <StatsSummary stats={getDashboardStats(AGREEMENTS, CURRENT_USER.id, today)} />
+        <QuickActions
+          waitingCount={waitingForYou.length}
+          firstWaitingId={waitingForYou[0]?.id}
+        />
+        <StatsSummary
+          stats={getDashboardStats(AGREEMENTS, CURRENT_USER.id, today)}
+        />
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-7">
           <div className="space-y-8">
@@ -60,7 +75,10 @@ export function HomePage() {
             <SectionHeading
               title="Sent by you"
               action={
-                <Link to={ROUTES.agreements} className="text-[15px] font-medium text-primary hover:underline">
+                <Link
+                  to={ROUTES.agreements}
+                  className="text-[15px] font-medium text-primary hover:underline"
+                >
                   View all agreements
                 </Link>
               }

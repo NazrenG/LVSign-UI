@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { CURRENT_USER } from '@/data/people';
-import { useDisclosure } from '@/hooks/useDisclosure';
-import { MobileHeader } from './MobileHeader';
-import { Sidebar } from './Sidebar';
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { CURRENT_USER } from "@/data/people";
+import { useDisclosure } from "@/hooks/useDisclosure";
+import { MobileHeader } from "./MobileHeader";
+import { Sidebar } from "./Sidebar";
 
 /**
  * Shell for every authenticated page with navigation:

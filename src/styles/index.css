@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /*
  * Design tokens — single source of truth for colours & typography.
@@ -6,9 +6,9 @@
  * (e.g. bg-canvas, text-ink-muted, font-serif).
  */
 @theme {
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Source Serif 4', ui-serif, Georgia, serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
   --color-canvas: #f4f4f2;
   --color-canvas-muted: #ecece8;

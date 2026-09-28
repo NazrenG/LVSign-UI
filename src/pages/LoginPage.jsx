@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { Logo } from '@/components/ui';
-import { ROUTES } from '@/constants/routes';
-import { LoginForm } from '@/features/auth/components/LoginForm';
-import { SignedDocumentPreview } from '@/features/auth/components/SignedDocumentPreview';
+import { useNavigate } from "react-router-dom";
+import { Logo } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
+import { LoginForm } from "@/features/auth/components/LoginForm";
+import { SignedDocumentPreview } from "@/features/auth/components/SignedDocumentPreview";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -16,9 +16,13 @@ export function LoginPage() {
         <div className="w-full max-w-lg">
           <Logo />
           <h1 className="mt-10 font-serif text-4xl text-ink">Sign in</h1>
-          <p className="mt-3 mb-8 text-[15px] text-ink-muted">Internal approvals for LV Logistics colleagues.</p>
+          <p className="mt-3 mb-8 text-[15px] text-ink-muted">
+            Internal approvals for LV Logistics colleagues.
+          </p>
           <LoginForm onSubmit={handleSignIn} />
-          <p className="mt-10 text-sm text-ink-muted">Forgot your password? Contact the IT service desk.</p>
+          <p className="mt-10 text-sm text-ink-muted">
+            Forgot your password? Contact the IT service desk.
+          </p>
         </div>
       </main>
 

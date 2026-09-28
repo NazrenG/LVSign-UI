@@ -1,9 +1,9 @@
-import { X } from 'lucide-react';
-import { Logo } from '@/components/ui';
-import { useLockBodyScroll } from '@/hooks/useLockBodyScroll';
-import { cn } from '@/utils/cn';
-import { SidebarNav } from './SidebarNav';
-import { SidebarUserCard } from './SidebarUserCard';
+import { X } from "lucide-react";
+import { Logo } from "@/components/ui";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
+import { cn } from "@/utils/cn";
+import { SidebarNav } from "./SidebarNav";
+import { SidebarUserCard } from "./SidebarUserCard";
 
 /**
  * Desktop (lg+): fixed column on the left.
@@ -16,8 +16,8 @@ export function Sidebar({ user, isOpen, onClose }) {
     <>
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-ink/30 transition-opacity lg:hidden',
-          isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+          "fixed inset-0 z-40 bg-ink/30 transition-opacity lg:hidden",
+          isOpen ? "opacity-100" : "pointer-events-none opacity-0",
         )}
         onClick={onClose}
         aria-hidden
@@ -25,9 +25,9 @@ export function Sidebar({ user, isOpen, onClose }) {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-line bg-canvas px-7 py-7',
-          'transition-transform duration-200 lg:w-[284px] lg:translate-x-0',
-          isOpen ? 'translate-x-0' : '-translate-x-full',
+          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-line bg-canvas px-7 py-7",
+          "transition-transform duration-200 lg:w-[284px] lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="mb-10 flex items-center justify-between">

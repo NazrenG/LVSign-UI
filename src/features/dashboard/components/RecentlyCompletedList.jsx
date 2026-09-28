@@ -1,6 +1,6 @@
-import { Card } from '@/components/ui';
-import { SignerChain, StatusBadge } from '@/features/agreements';
-import { formatDateTime } from '@/utils/formatters';
+import { Card } from "@/components/ui";
+import { SignerChain, StatusBadge } from "@/features/agreements";
+import { formatDateTime } from "@/utils/formatters";
 
 export function RecentlyCompletedList({ agreements }) {
   return (
@@ -13,8 +13,8 @@ export function RecentlyCompletedList({ agreements }) {
           <div className="min-w-0">
             <p className="font-medium text-ink">{agreement.title}</p>
             <p className="mt-0.5 font-mono text-[13px] text-ink-muted">
-              Signed by {agreement.signers.length} of {agreement.signers.length} ·{' '}
-              {formatDateTime(agreement.updatedAt)}
+              Signed by {agreement.signers.length} of {agreement.signers.length}{" "}
+              · {formatDateTime(agreement.updatedAt)}
             </p>
           </div>
           <div className="flex items-center gap-3">

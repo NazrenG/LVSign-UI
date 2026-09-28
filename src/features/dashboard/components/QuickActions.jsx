@@ -1,8 +1,8 @@
-import { LayoutTemplate, PenLine, Send } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Card, IconTile } from '@/components/ui';
-import { ROUTES } from '@/constants/routes';
-import { pluralize } from '@/utils/formatters';
+import { LayoutTemplate, PenLine, Send } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Card, IconTile } from "@/components/ui";
+import { ROUTES } from "@/constants/routes";
+import { pluralize } from "@/utils/formatters";
 
 function QuickActionCard({ icon, title, description, to }) {
   return (
@@ -22,28 +22,33 @@ export function QuickActions({ waitingCount, firstWaitingId }) {
   const actions = [
     {
       icon: Send,
-      title: 'Send a document',
-      description: 'Upload a file, add who signs and in what order.',
-      to: ROUTES.editDocument('new'),
+      title: "Send a document",
+      description: "Upload a file, add who signs and in what order.",
+      to: ROUTES.editDocument("new"),
     },
     {
       icon: PenLine,
-      title: 'Sign',
+      title: "Sign",
       description: waitingCount
-        ? `${pluralize(waitingCount, 'document')} ${waitingCount === 1 ? 'is' : 'are'} waiting for your signature.`
-        : 'Nothing is waiting for your signature.',
-      to: firstWaitingId ? ROUTES.signDocument(firstWaitingId) : ROUTES.agreements,
+        ? `${pluralize(waitingCount, "document")} ${waitingCount === 1 ? "is" : "are"} waiting for your signature.`
+        : "Nothing is waiting for your signature.",
+      to: firstWaitingId
+        ? ROUTES.signDocument(firstWaitingId)
+        : ROUTES.agreements,
     },
     {
       icon: LayoutTemplate,
-      title: 'Use a template',
-      description: 'Leave requests, rotas, invoice approvals and more.',
+      title: "Use a template",
+      description: "Leave requests, rotas, invoice approvals and more.",
       to: ROUTES.templates,
     },
   ];
 
   return (
-    <section aria-label="Quick actions" className="grid gap-4 md:grid-cols-3 lg:gap-5">
+    <section
+      aria-label="Quick actions"
+      className="grid gap-4 md:grid-cols-3 lg:gap-5"
+    >
       {actions.map((action) => (
         <QuickActionCard key={action.title} {...action} />
       ))}
