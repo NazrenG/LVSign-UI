@@ -44,7 +44,7 @@ export function Button({
     >
       {Icon && (
         <Icon
-          className="size-[1.1em] sSystem Developerink-0"
+          className="size-[1.1em] shrink-0"
           strokeWidth={1.75}
           aria-hidden
         />

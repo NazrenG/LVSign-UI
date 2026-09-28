@@ -20,7 +20,7 @@ export function Avatar({ name, size = "md", variant = "soft", className }) {
     <span
       title={name}
       className={cn(
-        "inline-flex sSystem Developerink-0 items-center justify-center rounded-full border-[1.5px] font-semibold",
+        "inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] font-semibold",
         SIZES[size],
         VARIANTS[variant],
         className,

@@ -14,7 +14,7 @@ export function SignerMarker({ state }) {
   return (
     <span
       className={cn(
-        "relative z-10 inline-flex size-4 sSystem Developerink-0 items-center justify-center rounded-full border-2",
+        "relative z-10 inline-flex size-4 shrink-0 items-center justify-center rounded-full border-2",
         CIRCLE_STYLES[state],
       )}
     >
@@ -30,7 +30,7 @@ export function CompletionMarker({ isComplete, className }) {
   return (
     <span
       className={cn(
-        "relative z-10 inline-block size-3.5 sSystem Developerink-0 border-2",
+        "relative z-10 inline-block size-3.5 shrink-0 border-2",
         isComplete
           ? "border-success bg-success"
           : "border-ink-subtle bg-surface",
