@@ -3,6 +3,7 @@ import { AppLayout } from "@/components/layout";
 import { ROUTES } from "@/constants/routes";
 import { AgreementsPage } from "@/pages/AgreementsPage";
 import { HomePage } from "@/pages/HomePage";
+import { LegacyDocumentEditRedirect } from "@/pages/LegacyDocumentEditRedirect";
 import { LoginPage } from "@/pages/LoginPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
@@ -27,9 +28,14 @@ export const router = createBrowserRouter([
   // Full-screen flows (own header, no sidebar)
   { path: ROUTES.templateBuilder(), element: <TemplateBuilderPage /> },
   {
-    path: ROUTES.editDocument(),
-    element: <PlaceholderPage title="Prepare document" standalone />,
+    // Lazy: the editor (and pdf.js) only load when someone prepares a document.
+    path: ROUTES.prepareEnvelope(),
+    lazy: async () => ({
+      Component: (await import("@/pages/EnvelopeEditorPage"))
+        .EnvelopeEditorPage,
+    }),
   },
+  { path: ROUTES.editDocument(), element: <LegacyDocumentEditRedirect /> },
   {
     path: ROUTES.signDocument(),
     element: <PlaceholderPage title="Sign document" standalone />,

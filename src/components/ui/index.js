@@ -20,3 +20,5 @@ export { StatGroup } from "./StatGroup";
 export { Textarea } from "./Textarea";
 export { Toggle } from "./Toggle";
 export { Menu } from "./Menu";
+export { Dialog } from "./Dialog";
+export { Sheet } from "./Sheet";

@@ -20,19 +20,29 @@ src/
 ├── constants/                # ROUTES, navigation items, departments
 ├── data/                     # Mock data: people, agreements, templates, role library
 ├── services/                 # Data access (templatesService) — swap for API calls here
+├── hooks/useUndoableReducer.js  # useReducer + undo/redo (used by the document editor)
 ├── utils/                    # cn(), date/text formatters — pure functions
 ├── hooks/                    # useDisclosure, useMediaQuery, useClickOutside…
 ├── components/
 │   ├── ui/                   # Design-system primitives (no domain knowledge)
 │   │                         #   Button, Card, Input, Select, Toggle, Checkbox,
 │   │                         #   SegmentedControl, OptionButtons, StatGroup, Menu…
-│   ├── shared/               # Generic steppers used by several features
-│   │                         #   StepProgress, VerticalSteps, RoleChain, StepMarker
+│   ├── shared/               # Generic building blocks used by several features
+│   │                         #   StepProgress, VerticalSteps, RoleChain, StepMarker,
+│   │                         #   pdf/ (PdfPage + lazy pdf.js loader)
 │   └── layout/               # AppLayout, Sidebar, MobileHeader, PageHeader
 ├── features/                 # Domain modules
 │   ├── agreements/           # statuses, selectors, signing route, table, detail panel
 │   ├── dashboard/            # Home page blocks
 │   ├── auth/                 # LoginForm, DepartmentPicker
+│   ├── envelopes/            # Prepare Document editor (envelope = one signing transaction)
+│   │   ├── models/                # Envelope, EnvelopeDocument, EnvelopeRecipient, EnvelopeField,
+│   │   │                          #   recipient types, field types
+│   │   ├── api/                   # envelopeRepository (contract) → dev/ adapter today, API adapter later
+│   │   ├── mappers/               # domain ⇄ transport DTO (the only place that knows the API shape)
+│   │   ├── utils/                 # coordinates (normalized 0..1), selectors, send checks, colours
+│   │   ├── hooks/                 # useEnvelopeEditor (facade), draft reducer, autosave, drag, zoom
+│   │   └── components/editor/     # header, documents panel, canvas, side panel cards, dialogs
 │   └── templates/
 │       ├── templateConstants.js   # categories, field types, builder steps…
 │       ├── templateSelectors.js   # filtering, sorting, field grouping (pure)
@@ -67,13 +77,28 @@ src/
 | Sign in                    | `/login`                                                | done        |
 | Home (dashboard)           | `/`                                                     | done        |
 | Agreements + detail panel  | `/agreements?selected=…`                                | done        |
-| Prepare document (editor)  | `/documents/:id/edit`                                   | placeholder |
+| Prepare document (editor)  | `/envelopes/:envelopeId/prepare?document=<id>`          | done        |
 | Sign document              | `/documents/:id/sign`                                   | placeholder |
 | Templates                  | `/templates`                                            | done        |
 | Template detail + pre-fill | `/templates/:id`                                        | done        |
 | Template builder (4 steps) | `/templates/:id/edit?step=basic\|roles\|fields\|expiry` | done        |
 
 New template: `/templates/new/edit`; duplicate: `/templates/new/edit?duplicate=<id>`.
+New envelope: `/envelopes/new/prepare`. The old `/documents/:id/edit` links redirect there.
+
+### Document editor — how data flows
+
+```
+components/editor  →  useEnvelopeEditor  →  envelopeRepository  →  dev adapter (today)
+   (presentation)       (state, actions,       (contract)            API adapter (TODO)
+                         autosave, checks)
+```
+
+- Field geometry is stored **normalized** (`x, y, width, height` in 0..1 of the page) and
+  drawn as percentages, so fields stay put at any zoom. Pixels exist only while dragging.
+- New recipients/fields get temporary `tmp_…` ids; `saveDraft` returns an `idMap` and the
+  editor swaps them for server ids (undo history included).
+- pdf.js (legacy build, `isEvalSupported: false`) is lazy-loaded with the editor route.
 
 Responsive: the sidebar becomes a drawer below `lg`, the agreements table becomes a
 card list below `md`, and the detail panel is a slide-over below `2xl`.

@@ -8,6 +8,13 @@ export const ROUTES = {
   templateBuilder: (id = ":templateId") => `/templates/${id}/edit`,
   insights: "/insights",
   admin: "/admin",
+  /**
+   * Prepare Document editor for an envelope. Use "new" to start a draft;
+   * add ?document=<documentId> to open a specific document.
+   */
+  prepareEnvelope: (envelopeId = ":envelopeId") =>
+    `/envelopes/${envelopeId}/prepare`,
+  /** Legacy link, redirects to prepareEnvelope. */
   editDocument: (id = ":documentId") => `/documents/${id}/edit`,
   signDocument: (id = ":documentId") => `/documents/${id}/sign`,
 };

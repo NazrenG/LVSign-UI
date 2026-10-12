@@ -32,6 +32,20 @@
   --color-danger: #b42318;
   --color-danger-soft: #fde7e4;
   --color-neutral-soft: #ececea;
+
+  /* Recipient identity colours (document editor). Muted to sit with the palette above. */
+  --color-recipient-1: #233d8c;
+  --color-recipient-1-soft: #e5e9f7;
+  --color-recipient-2: #1d6b5f;
+  --color-recipient-2-soft: #dff0ec;
+  --color-recipient-3: #7a3e8a;
+  --color-recipient-3-soft: #f1e6f4;
+  --color-recipient-4: #8a5a00;
+  --color-recipient-4-soft: #fcf0d3;
+  --color-recipient-5: #9a2f4f;
+  --color-recipient-5-soft: #f8e4ea;
+  --color-recipient-6: #3d6a8f;
+  --color-recipient-6-soft: #e3edf5;
 }
 
 @layer base {
