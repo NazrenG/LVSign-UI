@@ -4,6 +4,7 @@ import { ROUTES } from "@/constants/routes";
 import { AgreementsPage } from "@/pages/AgreementsPage";
 import { HomePage } from "@/pages/HomePage";
 import { LegacyDocumentEditRedirect } from "@/pages/LegacyDocumentEditRedirect";
+import { LegacyDocumentSignRedirect } from "@/pages/LegacyDocumentSignRedirect";
 import { LoginPage } from "@/pages/LoginPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
@@ -37,8 +38,12 @@ export const router = createBrowserRouter([
   },
   { path: ROUTES.editDocument(), element: <LegacyDocumentEditRedirect /> },
   {
-    path: ROUTES.signDocument(),
-    element: <PlaceholderPage title="Sign document" standalone />,
+    // Lazy: the signing flow (and pdf.js) only load when a recipient signs.
+    path: ROUTES.signEnvelope(),
+    lazy: async () => ({
+      Component: (await import("@/pages/SigningPage")).SigningPage,
+    }),
   },
+  { path: ROUTES.signDocument(), element: <LegacyDocumentSignRedirect /> },
   { path: "*", element: <NotFoundPage /> },
 ]);

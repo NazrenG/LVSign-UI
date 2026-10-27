@@ -16,5 +16,8 @@ export const ROUTES = {
     `/envelopes/${envelopeId}/prepare`,
   /** Legacy link, redirects to prepareEnvelope. */
   editDocument: (id = ":documentId") => `/documents/${id}/edit`,
+  /** Recipient signing flow for an envelope (full screen, no sidebar). */
+  signEnvelope: (envelopeId = ":envelopeId") => `/envelopes/${envelopeId}/sign`,
+  /** Legacy link, redirects to signEnvelope. */
   signDocument: (id = ":documentId") => `/documents/${id}/sign`,
 };
