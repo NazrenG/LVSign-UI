@@ -77,7 +77,16 @@ export function EnvelopeEditorPage() {
         />
       );
     }
+
     return <StatusScreen isLoading message="Opening envelope…" />;
+  }
+  if (editor.envelope.status !== "draft") {
+    return (
+      <StatusScreen
+        title="Envelope can’t be edited"
+        message="This envelope has already been sent and can no longer be changed."
+      />
+    );
   }
 
   return (

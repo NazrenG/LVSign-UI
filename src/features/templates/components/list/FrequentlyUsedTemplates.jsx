@@ -7,7 +7,7 @@ export function FrequentlyUsedTemplates({ templates }) {
   return (
     <section>
       <SectionHeading
-        title="Frequently used"
+        title="My Templates"
         description="Based on the last 30 days"
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

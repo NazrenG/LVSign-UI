@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Redo2, Send, Undo2 } from "lucide-react";
+import { ArrowLeft, Check, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge, Button } from "@/components/ui";
 import { cn } from "@/utils/cn";
@@ -89,7 +89,6 @@ export function EnvelopeEditorHeader({
   backTo,
   checks,
   save,
-  history,
   actions,
   onReview,
 }) {
@@ -110,9 +109,14 @@ export function EnvelopeEditorHeader({
             <div className="flex items-center gap-2">
               <input
                 value={envelope.title}
-                onChange={(event) =>
-                  actions.updateDetails({ title: event.target.value })
-                }
+                onChange={(event) => {
+                  const subject = event.target.value;
+
+                  actions.updateDetails({
+                    title: subject,
+                    emailSubject: subject,
+                  });
+                }}
                 aria-label="Envelope title"
                 placeholder="Untitled envelope"
                 // `size` makes the input as wide as its text, so the badge sits right after it.
@@ -130,8 +134,8 @@ export function EnvelopeEditorHeader({
         <div className="flex items-center justify-between gap-3 lg:justify-end">
           <SaveStatus save={save} />
           <div className="flex items-center gap-2">
-            <div className="hidden gap-1 md:flex">
-              <Button
+           {/*   <div className="hidden gap-1 md:flex">
+             <Button
                 variant="ghost"
                 size="sm"
                 aria-label="Undo"
@@ -140,7 +144,7 @@ export function EnvelopeEditorHeader({
                 onClick={history.undo}
               >
                 <Undo2 className="size-4" />
-              </Button>
+              </Button> 
               <Button
                 variant="ghost"
                 size="sm"
@@ -151,7 +155,7 @@ export function EnvelopeEditorHeader({
               >
                 <Redo2 className="size-4" />
               </Button>
-            </div>
+            </div>*/}
             <span className="hidden sm:block">
               <Button
                 variant="secondary"

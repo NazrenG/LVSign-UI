@@ -3,10 +3,10 @@ import { Card, CardHeader, Input, Select, Textarea } from "@/components/ui";
 
 const REMINDER_OPTIONS = [
   { value: 0, label: "No reminders" },
-  { value: 1, label: "Remind every day" },
-  { value: 2, label: "Remind every 2 days" },
-  { value: 3, label: "Remind every 3 days" },
-  { value: 7, label: "Remind every week" },
+  { value: 1, label: "Every day" },
+  { value: 2, label: "Every 2 days" },
+  { value: 3, label: "Every 3 days" },
+  { value: 7, label: "Every week" },
 ];
 
 /** Email subject/message, due date and reminders for the whole envelope. */
@@ -17,10 +17,15 @@ export function EnvelopeDetailsCard({ envelope, actions }) {
       <div className="space-y-4">
         <Input
           label="Email subject"
-          value={envelope.emailSubject}
-          onChange={(event) =>
-            actions.updateDetails({ emailSubject: event.target.value })
-          }
+          value={envelope.title}
+          onChange={(event) => {
+            const subject = event.target.value;
+
+            actions.updateDetails({
+              title: subject,
+              emailSubject: subject,
+            });
+          }}
         />
         <Textarea
           label="Message to recipients"
@@ -44,11 +49,15 @@ export function EnvelopeDetailsCard({ envelope, actions }) {
             label="Reminders"
             options={REMINDER_OPTIONS}
             value={envelope.reminderEveryDays}
-            onChange={(event) =>
+            onChange={(event) => {
+              const value = Number(event.target.value);
+
+              console.log("REMINDER SELECTED:", value);
+
               actions.updateDetails({
-                reminderEveryDays: Number(event.target.value),
-              })
-            }
+                reminderEveryDays: value,
+              });
+            }}
           />
         </div>
       </div>

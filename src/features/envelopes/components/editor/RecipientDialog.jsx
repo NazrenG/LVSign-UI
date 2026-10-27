@@ -5,9 +5,12 @@ import {
   OptionButtons,
   SettingRow,
   Toggle,
+  Select,
 } from "@/components/ui";
 import { ROUTING_MODE } from "../../models/envelopeModel";
 import { RECIPIENT_TYPES } from "../../models/recipientTypes";
+import { useState,useRef } from "react";
+import { isClientId } from "../../api/clientIds";
 
 const TYPE_OPTIONS = Object.entries(RECIPIENT_TYPES).map(
   ([value, { label, icon }]) => ({ value, label, icon }),
@@ -36,62 +39,185 @@ const PERMISSIONS = [
  * Edit one recipient. Changes apply immediately (and can be undone);
  * "Done" just closes.
  */
-export function RecipientDialog({ envelope, recipient, onClose, actions }) {
-  if (!recipient) return null;
+export function RecipientDialog({
+  envelope,
+  recipient,
+  users,
+  commands,
+  onClose,
+  actions,
+}) {
+  const [draftRecipient, setDraftRecipient] = useState(() =>
+    recipient
+      ? {
+          ...recipient,
+          permissions: {
+            ...recipient.permissions,
+          },
+        }
+      : null,
+  );
+  const [saveState, setSaveState] = useState({
+    isSaving: false,
+    error: "",
+  });
+  const requestInFlightRef = useRef(false);
+  if (!recipient || !draftRecipient) {
+    return null;
+  }
 
-  const update = (patch) => actions.updateRecipient(recipient.id, patch);
-  const setPermission = (key, value) =>
-    update({ permissions: { ...recipient.permissions, [key]: value } });
+  const isNewRecipient = isClientId(recipient.id);
+  const save = async () => {
+    if (requestInFlightRef.current) {
+      return;
+    }
+
+    requestInFlightRef.current = true;
+
+    try {
+      setSaveState({
+        isSaving: true,
+        error: "",
+      });
+
+      await commands.saveRecipient(draftRecipient);
+
+      onClose();
+    } catch (error) {
+      setSaveState({
+        isSaving: false,
+        error: error.message ?? "Recipient could not be saved.",
+      });
+    } finally {
+      requestInFlightRef.current = false;
+    }
+  };
+  const update = (patch) => {
+    setDraftRecipient((current) => ({
+      ...current,
+      ...patch,
+    }));
+  };
+
+  const setPermission = (key, value) => {
+    setDraftRecipient((current) => ({
+      ...current,
+
+      permissions: {
+        ...current.permissions,
+        [key]: value,
+      },
+    }));
+  };
   const isParallel = envelope.routingMode === ROUTING_MODE.PARALLEL;
-  const type = RECIPIENT_TYPES[recipient.recipientType];
+  const type = RECIPIENT_TYPES[draftRecipient.recipientType];
   const fieldCount = envelope.fields.filter(
     (field) => field.recipientId === recipient.id,
   ).length;
 
-  const remove = () => {
-    actions.removeRecipient(recipient.id);
-    onClose();
+  const remove = async () => {
+    if (requestInFlightRef.current) {
+      return;
+    }
+
+    requestInFlightRef.current = true;
+
+    try {
+      setSaveState({
+        isSaving: true,
+        error: "",
+      });
+
+      await commands.removeRecipient(recipient.id);
+
+      onClose();
+    } catch (error) {
+      setSaveState({
+        isSaving: false,
+        error: error.message ?? "Recipient could not be removed.",
+      });
+    } finally {
+      requestInFlightRef.current = false;
+    }
   };
 
   return (
     <Dialog
       isOpen
       title={recipient.displayName.trim() ? "Edit recipient" : "Add recipient"}
-      onClose={onClose}
+      onClose={() => {
+        if (!saveState.isSaving) {
+          onClose();
+        }
+      }}
       footer={
         <>
           <Button
             variant="danger"
             onClick={remove}
             className="mr-auto"
-            disabled={!recipient.permissions.allowSenderDeleteRecipient}
+            disabled={
+              saveState.isSaving ||
+              !recipient.permissions.allowSenderDeleteRecipient
+            }
           >
-            Remove recipient
+            {saveState.isSaving ? "Working…" : "Remove recipient"}
           </Button>
-          <Button onClick={onClose}>Done</Button>
+          {saveState.error && (
+            <p className="mr-auto text-[13px] text-danger">{saveState.error}</p>
+          )}
+
+          <Button
+            onClick={save}
+            disabled={!draftRecipient.userId || saveState.isSaving}
+          >
+            {saveState.isSaving ? "Saving…" : "Done"}
+          </Button>
         </>
       }
     >
       <div className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input
-            label="Name"
-            value={recipient.displayName}
-            autoComplete="off"
-            onChange={(event) => update({ displayName: event.target.value })}
+          <Select
+            label="Employee"
+            value={draftRecipient.userId ?? ""}
+            options={[
+              {
+                value: "",
+                label: "Select employee",
+              },
+
+              ...users.map((user) => ({
+                value: user.id,
+                label: user.displayName,
+              })),
+            ]}
+            onChange={(event) => {
+              const user = users.find((item) => item.id === event.target.value);
+
+              if (!user) {
+                update({
+                  userId: null,
+                  displayName: "",
+                  email: "",
+                });
+
+                return;
+              }
+
+              update({
+                userId: user.id,
+                displayName: user.displayName,
+                email: user.email,
+              });
+            }}
           />
-          <Input
-            label="Email"
-            type="email"
-            value={recipient.email}
-            autoComplete="off"
-            placeholder="name.surname@company"
-            onChange={(event) => update({ email: event.target.value.trim() })}
-          />
+
+          <Input label="Email" value={draftRecipient.email} disabled />
         </div>
         <Input
           label="Role (optional)"
-          value={recipient.roleName ?? ""}
+          value={draftRecipient.roleName ?? ""}
           placeholder="e.g. Operations manager"
           hint="Shown to other recipients next to the name."
           onChange={(event) => update({ roleName: event.target.value })}
@@ -101,7 +227,7 @@ export function RecipientDialog({ envelope, recipient, onClose, actions }) {
           <OptionButtons
             legend="Recipient type"
             options={TYPE_OPTIONS}
-            value={recipient.recipientType}
+            value={draftRecipient.recipientType}
             onChange={(recipientType) => update({ recipientType })}
           />
           <p className="mt-1.5 text-[13px] text-ink-muted">
@@ -120,9 +246,10 @@ export function RecipientDialog({ envelope, recipient, onClose, actions }) {
             label="Signing step"
             type="number"
             min={1}
-            value={isParallel ? 1 : recipient.routingOrder}
+            value={isParallel ? 1 : draftRecipient.routingOrder}
             disabled={
-              isParallel || !recipient.permissions.allowSenderChangeRoutingOrder
+              isParallel ||
+              !draftRecipient.permissions.allowSenderChangeRoutingOrder
             }
             onChange={(event) =>
               update({
@@ -145,7 +272,7 @@ export function RecipientDialog({ envelope, recipient, onClose, actions }) {
           control={
             <Toggle
               label="Required"
-              checked={recipient.isRequired}
+              checked={draftRecipient.isRequired}
               onChange={(isRequired) => update({ isRequired })}
             />
           }
@@ -161,7 +288,8 @@ export function RecipientDialog({ envelope, recipient, onClose, actions }) {
               control={
                 <Toggle
                   label={permission.title}
-                  checked={recipient.permissions[permission.key]}
+                  checked={draftRecipient.permissions[permission.key]}
+                  disabled={!isNewRecipient}
                   onChange={(value) => setPermission(permission.key, value)}
                 />
               }

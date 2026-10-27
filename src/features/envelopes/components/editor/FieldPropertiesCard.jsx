@@ -72,6 +72,9 @@ export function FieldPropertiesCard({
   commands,
 }) {
   const update = (patch, coalesceKey) =>
+    commands.updateField(field.id, patch, { coalesceKey });
+
+  const updateLocal = (patch, coalesceKey) =>
     actions.updateField(field.id, patch, { coalesceKey });
   const document = getDocument(envelope, field.documentId);
   const recipient = envelope.recipients.find(

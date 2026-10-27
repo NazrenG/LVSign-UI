@@ -87,7 +87,7 @@ export function TemplatesPage() {
 
         <section>
           <SectionHeading
-            title={isFiltering ? "Results" : "All templates"}
+            title={isFiltering ? "Results" : "Share with me"}
             description={`Showing ${visible.length} of ${results.length}`}
             action={
               <span className="hidden text-[13px] text-ink-muted md:block">

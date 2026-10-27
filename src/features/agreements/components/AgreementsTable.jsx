@@ -45,7 +45,9 @@ function TableView({ agreements, selectedId, onSelect }) {
               {agreement.title}
             </td>
             <td className="min-w-36 px-4 py-4 text-ink-muted">
-              {getPerson(agreement.senderId).name}
+              {agreement.senderName ??
+                getPerson(agreement.senderId)?.name ??
+                "Unknown"}
             </td>
             <td className="px-4 py-4">
               <SignerChain agreement={agreement} />

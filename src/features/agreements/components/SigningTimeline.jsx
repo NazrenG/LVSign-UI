@@ -24,16 +24,17 @@ function getTimelineCaption(signer) {
 
 /** Vertical signing route used in the agreement detail panel. */
 export function SigningTimeline({ agreement }) {
-  const steps = agreement.signers.map((signer) => {
-    const person = getPerson(signer.personId);
-    return {
-      key: signer.personId,
-      title: person.name,
-      subtitle: person.title,
-      caption: getTimelineCaption(signer),
-      state: SIGNER_STEP_STATE[signer.state],
-    };
-  });
+ const steps = agreement.signers.map((signer) => {
+  const person = getPerson(signer.personId);
+
+  return {
+    key: signer.recipientId ?? signer.personId,
+    title: signer.name ?? person?.name ?? "Unknown",
+    subtitle: person?.title,
+    caption: getTimelineCaption(signer),
+    state: SIGNER_STEP_STATE[signer.state],
+  };
+});
 
   const isComplete = agreement.status === AGREEMENT_STATUS.COMPLETED;
 

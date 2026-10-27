@@ -47,16 +47,22 @@ export function getWaitingSummary(agreement) {
   const remaining = agreement.signers.filter(
     (signer) => signer.state === SIGNER_STATE.PENDING,
   ).length;
-  const name = getPerson(current.personId).name;
+  const name = current.name ?? getPerson(current.personId)?.name ??  "Unknown";
   if (remaining === 0) return `Waiting for ${name}`;
   return `Waiting for ${name} and ${remaining} other${remaining === 1 ? "" : "s"}`;
 }
 
 export const getReminderLabel = (agreement) => {
   const current = getCurrentSigner(agreement);
-  return current
-    ? `Remind ${getFirstName(getPerson(current.personId).name)}`
-    : null;
+
+  if (!current) return null;
+
+  const name =
+    current.name ??
+    getPerson(current.personId)?.name ??
+    "Unknown";
+
+  return `Remind ${getFirstName(name)}`;
 };
 
 /* ---------- collections ---------- */

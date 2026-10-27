@@ -12,6 +12,8 @@ import { EditorSidePanel } from "./EditorSidePanel";
 import { EnvelopeEditorHeader } from "./EnvelopeEditorHeader";
 import { RecipientDialog } from "./RecipientDialog";
 import { ReviewSendDialog } from "./ReviewSendDialog";
+import { isClientId } from "../../api/clientIds";
+
 
 /**
  * Prepare Document screen for a loaded envelope.
@@ -30,7 +32,6 @@ export function EnvelopeEditor({ editor, backTo, onSent }) {
     commands,
     activeDocument,
     selectedField,
-    history,
     save,
     checks,
   } = editor;
@@ -64,8 +65,7 @@ export function EnvelopeEditor({ editor, backTo, onSent }) {
     isEnabled: true,
     selectedField,
     commands,
-    actions,
-    history,
+    actions
   });
 
   const showPage = useCallback(
@@ -126,8 +126,7 @@ export function EnvelopeEditor({ editor, backTo, onSent }) {
         envelope={envelope}
         backTo={backTo}
         checks={checks}
-        save={save}
-        history={history}
+        save={save} 
         actions={actions}
         onReview={() => setIsReviewOpen(true)}
       />
@@ -183,14 +182,36 @@ export function EnvelopeEditor({ editor, backTo, onSent }) {
         {sidePanel}
       </Sheet>
 
-      <RecipientDialog
-        envelope={envelope}
-        recipient={envelope.recipients.find(
-          (recipient) => recipient.id === editor.resolveId(editingRecipientId),
-        )}
-        actions={actions}
-        onClose={() => setEditingRecipientId(null)}
-      />
+      {editingRecipientId && (
+        <RecipientDialog
+          key={editor.resolveId(editingRecipientId)}
+          envelope={envelope}
+          recipient={envelope.recipients.find(
+            (recipient) =>
+              recipient.id === editor.resolveId(editingRecipientId),
+          )}
+          users={editor.users}
+          actions={actions}
+          commands={commands}
+          onClose={() => {
+            const resolvedId = editor.resolveId(editingRecipientId);
+
+            const currentRecipient = envelope.recipients.find(
+              (recipient) => recipient.id === resolvedId,
+            );
+
+            /*
+             * Yeni recipient hələ backend-ə save edilməyibsə
+             * X ilə dialog bağlananda temporary recipient-i də sil.
+             */
+            if (currentRecipient && isClientId(currentRecipient.id)) {
+              actions.removeRecipient(currentRecipient.id);
+            }
+
+            setEditingRecipientId(null);
+          }}
+        />
+      )}
       <ReviewSendDialog
         isOpen={isReviewOpen}
         envelope={envelope}

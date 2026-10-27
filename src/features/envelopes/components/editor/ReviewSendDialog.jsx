@@ -15,14 +15,31 @@ export function ReviewSendDialog({
   onSend,
   onIssueSelect,
 }) {
-  const [state, setState] = useState({ isSending: false, error: null });
+  const [isSending, setIsSending] = useState(false);
 
-  const send = async () => {
-    setState({ isSending: true, error: null });
+  const [sendError, setSendError] = useState("");
+  // const send = async () => {
+  //   setState({ isSending: true, error: null });
+  //   try {
+  //     await onSend();
+  //   } catch (error) {
+  //     setState({ isSending: false, error: error.message });
+  //   }
+  // };
+  const handleSend = async () => {
+    if (isSending) {
+      return;
+    }
+
     try {
+      setIsSending(true);
+      setSendError("");
+
       await onSend();
     } catch (error) {
-      setState({ isSending: false, error: error.message });
+      setSendError(error.message ?? "Envelope could not be sent.");
+
+      setIsSending(false);
     }
   };
 
@@ -35,18 +52,19 @@ export function ReviewSendDialog({
       onClose={onClose}
       footer={
         <>
-          {state.error && (
-            <p className="mr-auto text-[13px] text-danger">{state.error}</p>
+          {sendError && (
+            <p className="mr-auto text-[13px] text-danger">{sendError}</p>
           )}
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" disabled={isSending} onClick={onClose}>
             Keep editing
           </Button>
+
           <Button
             icon={Send}
-            onClick={send}
-            disabled={!isReady || state.isSending}
+            disabled={isSending || !isReady}
+            onClick={handleSend}
           >
-            {state.isSending ? "Sending…" : "Send envelope"}
+            {isSending ? "Sending…" : "Send envelope"}
           </Button>
         </>
       }

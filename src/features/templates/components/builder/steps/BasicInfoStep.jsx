@@ -73,12 +73,7 @@ export function BasicInfoStep({ template, actions }) {
                 : "For example HR-LEAVE"
             }
           />
-          <Select
-            label="Language"
-            options={LANGUAGES}
-            value={template.language}
-            onChange={setValue("language")}
-          />
+         
           <Input
             label="Owner"
             icon={User}

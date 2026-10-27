@@ -15,11 +15,15 @@ const TERMINATED = [AGREEMENT_STATUS.DECLINED, AGREEMENT_STATUS.VOIDED];
 
 /** Compact avatar route for tables and lists: (LH)─(FA)─(OG)─□ */
 export function SignerChain({ agreement, className }) {
-  const items = agreement.signers.map((signer) => ({
-    key: signer.personId,
-    name: getPerson(signer.personId).name,
+  const items = agreement.signers.map((signer) => {
+  const person = getPerson(signer.personId);
+
+  return {
+    key: signer.recipientId ?? signer.personId,
+    name: signer.name ?? person?.name ?? "Unknown",
     variant: AVATAR_VARIANT[signer.state],
-  }));
+  };
+});
 
   return (
     <RoleChain

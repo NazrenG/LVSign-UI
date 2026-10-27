@@ -7,6 +7,7 @@ import {
   countFieldsByDocument,
   getFieldsOnPage,
 } from "../../utils/envelopeSelectors";
+import { useState } from "react";
 
 const THUMBNAIL_WIDTH = 120;
 
@@ -72,7 +73,21 @@ export function DocumentsPanel({
   onPageSelect,
 }) {
   const fieldCounts = countFieldsByDocument(envelope);
+  const [deletingId, setDeletingId] = useState(null); //for double click
+  const handleDelete = async (documentId) => {
+    if (deletingId) {
+      return;
+    }
 
+    try {
+      setDeletingId(documentId);
+
+      await commands.removeDocument(documentId);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+  
   return (
     <nav aria-label="Documents" className="space-y-4">
       <h2 className="flex items-baseline justify-between text-base font-semibold text-ink">
@@ -128,17 +143,29 @@ export function DocumentsPanel({
                   items={[
                     {
                       label: "Move up",
-                      onSelect: () => actions.moveDocument(document.id, -1),
+                      onSelect: () => commands.moveDocument(document.id, -1),
                       disabled: index === 0,
                     },
                     {
                       label: "Move down",
-                      onSelect: () => actions.moveDocument(document.id, 1),
+                      onSelect: () => commands.moveDocument(document.id, 1),
                       disabled: index === envelope.documents.length - 1,
                     },
+                    // {
+                    //   label: "Remove document",
+                    //   onSelect: () => commands.removeDocument(document.id),
+                    //   tone: "danger",
+                    // },
                     {
-                      label: "Remove document",
-                      onSelect: () => actions.removeDocument(document.id),
+                      label:
+                        deletingId === document.id
+                          ? "Removing…"
+                          : "Remove document",
+
+                      onSelect: () => handleDelete(document.id),
+
+                      disabled: deletingId === document.id,
+
                       tone: "danger",
                     },
                   ]}

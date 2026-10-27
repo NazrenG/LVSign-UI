@@ -45,6 +45,36 @@ export function useEnvelopeDraft() {
           patch,
           meta: { coalesceKey: `details:${Object.keys(patch).join(",")}` },
         }),
+
+      removeRoutingRule: (id) =>
+        dispatch({
+          type: DRAFT.REMOVE_ROUTING_RULE,
+          id,
+
+          meta: {
+            skipHistory: true,
+          },
+        }),
+
+      updateRoutingRule: (rule) =>
+        dispatch({
+          type: DRAFT.UPDATE_ROUTING_RULE,
+
+          rule,
+
+          meta: {
+            skipHistory: true,
+          },
+        }),
+
+      addRoutingRule: (rule) =>
+        dispatch({
+          type: DRAFT.ADD_ROUTING_RULE,
+          rule,
+          meta: {
+            skipHistory: true,
+          },
+        }),
       setRoutingMode: (mode) =>
         dispatch({ type: DRAFT.SET_ROUTING_MODE, mode }),
 
@@ -58,6 +88,7 @@ export function useEnvelopeDraft() {
       addRecipient: (values = {}) => {
         const recipient = {
           id: createClientId(),
+          userId: null,
           displayName: "",
           email: "",
           roleName: "",

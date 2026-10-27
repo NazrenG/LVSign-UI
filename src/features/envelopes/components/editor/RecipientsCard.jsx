@@ -34,7 +34,7 @@ export function RecipientsCard({
         label="Signing order"
         options={ROUTING_OPTIONS}
         value={envelope.routingMode}
-        onChange={actions.setRoutingMode}
+        onChange={commands.setRoutingMode}
         className="mb-4 *:py-1.5 *:text-sm"
       />
 

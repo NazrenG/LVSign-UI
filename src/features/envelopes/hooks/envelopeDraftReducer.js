@@ -29,6 +29,9 @@ export const DRAFT = {
   UPDATE_FIELD: "field/update",
   REMOVE_FIELD: "field/remove",
   APPLY_SERVER_IDS: "ids/applyServerIds",
+  ADD_ROUTING_RULE: "routingRule/add",
+  REMOVE_ROUTING_RULE: "routingRule/remove",
+  UPDATE_ROUTING_RULE: "routingRule/update",
 };
 
 const GEOMETRY_KEYS = ["x", "y", "width", "height"];
@@ -55,14 +58,48 @@ export function envelopeDraftReducer(envelope, action) {
     case DRAFT.UPDATE_DETAILS:
       return { ...envelope, ...action.patch };
 
+    case DRAFT.ADD_ROUTING_RULE:
+      return {
+        ...envelope,
+
+        routingRules: [...envelope.routingRules, action.rule],
+      };
+
+    case DRAFT.REMOVE_ROUTING_RULE:
+      return {
+        ...envelope,
+
+        routingRules: envelope.routingRules.filter(
+          (rule) => rule.id !== action.id,
+        ),
+      };
+    case DRAFT.UPDATE_ROUTING_RULE:
+      return {
+        ...envelope,
+
+        routingRules: envelope.routingRules.map((rule) =>
+          rule.id === action.rule.id ? action.rule : rule,
+        ),
+      };
+
     case DRAFT.SET_ROUTING_MODE: {
-      if (envelope.routingMode === action.mode) return envelope;
-      // Switching to "in order" spreads everyone over consecutive steps.
+      if (envelope.routingMode === action.mode) {
+        return envelope;
+      }
+
       const recipients =
         action.mode === ROUTING_MODE.SEQUENTIAL
           ? renumberRoutingOrder(sortByRoutingOrder(envelope.recipients))
-          : envelope.recipients;
-      return { ...envelope, routingMode: action.mode, recipients };
+          : envelope.recipients.map((recipient) => ({
+              ...recipient,
+              routingOrder: 1,
+            }));
+
+      return {
+        ...envelope,
+        routingMode: action.mode,
+        recipients,
+      };
     }
 
     case DRAFT.ADD_DOCUMENT:

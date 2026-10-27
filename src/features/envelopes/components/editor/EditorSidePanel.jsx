@@ -5,11 +5,7 @@ import { RecipientsCard } from "./RecipientsCard";
 import { RoutingSummaryCard } from "./RoutingSummaryCard";
 import { SendChecklistCard } from "./SendChecklistCard";
 
-/**
- * Right column (a sheet on small screens).
- * Nothing selected: recipients, palette, checklist, message, signing order.
- * Field selected:   its properties first, then palette and recipients.
- */
+
 export function EditorSidePanel({
   editor,
   colorsById,
@@ -74,7 +70,7 @@ export function EditorSidePanel({
       {paletteCard}
       <SendChecklistCard checks={checks} onIssueSelect={onIssueSelect} />
       <EnvelopeDetailsCard envelope={envelope} actions={actions} />
-      <RoutingSummaryCard envelope={envelope} />
+      <RoutingSummaryCard envelope={envelope} commands={commands}/>
     </div>
   );
 }

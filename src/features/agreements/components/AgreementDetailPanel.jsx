@@ -43,7 +43,9 @@ export function AgreementDetailPanel({ agreement, onClose }) {
 
       <dl className="grid grid-cols-2 gap-4 border-b border-line pb-6">
         <DetailItem label="Sent by">
-          {getPerson(agreement.senderId).name}
+         {agreement.senderName ??
+  getPerson(agreement.senderId)?.name ??
+  "Unknown"}
         </DetailItem>
         <DetailItem label="Due">
           {agreement.dueAt ? formatDueDate(agreement.dueAt) : "—"}

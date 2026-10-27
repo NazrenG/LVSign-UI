@@ -4,8 +4,7 @@ import { Button, IconTile } from "@/components/ui";
 import { getFieldsOnPage } from "../../utils/envelopeSelectors";
 import { PX_PER_POINT } from "../../hooks/useCanvasViewport";
 import { DocumentPage } from "./DocumentPage";
-
-/** Scrollable stack of the active document's pages. */
+ 
 export function DocumentCanvas({
   envelope,
   document,
@@ -25,8 +24,8 @@ export function DocumentCanvas({
   );
 
   const commitRect = useMemo(
-    () => (fieldId, rect) => actions.updateField(fieldId, rect),
-    [actions],
+    () => (fieldId, rect) => commands.updateField(fieldId, rect),
+    [commands],
   );
 
   return (

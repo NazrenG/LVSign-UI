@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ListFilter, Send } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/layout";
 import { Button, SearchInput } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
-import { AGREEMENTS } from "@/data/agreements";
+import { getAgreements } from "@/services/agreementsService";
+
 import {
   AgreementDetailPanel,
   AgreementsTable,
@@ -15,31 +16,93 @@ import {
 import { useIsAtLeast } from "@/hooks/useMediaQuery";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import { cn } from "@/utils/cn";
-
 export function AgreementsPage() {
   const [status, setStatus] = useState("all");
   const [query, setQuery] = useState("");
+
+  const [agreements, setAgreements] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const isDesktop = useIsAtLeast("2xl");
 
-  // Desktop shows the first document by default; smaller screens open the panel on tap only.
+  useEffect(() => {
+    async function loadAgreements() {
+      try {
+        setIsLoading(true);
+        setError("");
+
+        const data = await getAgreements();
+
+        setAgreements(data);
+      } catch (err) {
+        console.error(err);
+
+        setError("Agreements could not be loaded.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadAgreements();
+  }, []);
+
   const selectedId =
-    searchParams.get("selected") ?? (isDesktop ? AGREEMENTS[0]?.id : null);
-  const selectedAgreement = AGREEMENTS.find(
+    searchParams.get("selected") ??
+    (isDesktop ? agreements[0]?.id : null);
+
+  const selectedAgreement = agreements.find(
     (agreement) => agreement.id === selectedId,
   );
-  const isDrawerOpen = Boolean(selectedAgreement) && !isDesktop;
+
+  const isDrawerOpen =
+    Boolean(selectedAgreement) && !isDesktop;
+
   useLockBodyScroll(isDrawerOpen);
 
-  const counts = useMemo(() => countByStatus(AGREEMENTS), []);
-  const visibleAgreements = filterAgreements(AGREEMENTS, { status, query });
+  const counts = useMemo(
+    () => countByStatus(agreements),
+    [agreements],
+  );
+
+  const visibleAgreements = filterAgreements(
+    agreements,
+    {
+      status,
+      query,
+    },
+  );
 
   const selectAgreement = (id) =>
-    setSearchParams({ selected: id }, { replace: true });
-  // An empty value (not a missing one) means "closed", so desktop doesn't fall back to the first row.
-  const closeDetails = () =>
-    setSearchParams({ selected: "" }, { replace: true });
+    setSearchParams(
+      { selected: id },
+      { replace: true },
+    );
 
+  const closeDetails = () =>
+    setSearchParams(
+      { selected: "" },
+      { replace: true },
+    );
+
+  // BUNLAR bütün hook-lardan SONRA olmalıdır
+  if (isLoading) {
+    return (
+      <div className="p-6 text-ink-muted">
+        Loading agreements...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-danger">
+        {error}
+      </div>
+    );
+  }
   return (
     <>
       <PageHeader
@@ -71,7 +134,7 @@ export function AgreementsPage() {
             onSelect={selectAgreement}
           />
           <p className="text-sm text-ink-muted">
-            Showing {visibleAgreements.length} of {AGREEMENTS.length} documents
+            Showing {visibleAgreements.length} of {agreements.length} documents
           </p>
         </section>
 

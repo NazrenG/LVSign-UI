@@ -21,11 +21,10 @@ export function useEditorShortcuts({
   selectedField,
   commands,
   actions,
-  history,
 }) {
   const latest = useRef(null);
   useEffect(() => {
-    latest.current = { selectedField, commands, actions, history };
+    latest.current = { selectedField, commands, actions };
   });
 
   useEffect(() => {
@@ -41,22 +40,21 @@ export function useEditorShortcuts({
         selectedField: field,
         commands: cmd,
         actions: act,
-        history: hist,
       } = latest.current;
       const mod = event.metaKey || event.ctrlKey;
       const key = event.key.toLowerCase();
 
-      if (mod && key === "z") {
-        event.preventDefault();
-        if (event.shiftKey) hist.redo();
-        else hist.undo();
-        return;
-      }
-      if (mod && key === "y") {
-        event.preventDefault();
-        hist.redo();
-        return;
-      }
+      // if (mod && key === "z") {
+      //   event.preventDefault();
+      //   if (event.shiftKey) hist.redo();
+      //   else hist.undo();
+      //   return;
+      // }
+      // if (mod && key === "y") {
+      //   event.preventDefault();
+      //   hist.redo();
+      //   return;
+      // }
       if (!field) return;
 
       if (key === "delete" || key === "backspace") {
@@ -76,7 +74,7 @@ export function useEditorShortcuts({
           arrowup: { y: field.y - step },
           arrowdown: { y: field.y + step },
         }[key];
-        act.updateField(field.id, delta, { coalesceKey: `nudge:${field.id}` });
+        cmd.updateField(field.id, delta, { coalesceKey: `nudge:${field.id}` });
       }
     };
 
