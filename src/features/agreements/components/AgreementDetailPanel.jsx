@@ -1,4 +1,4 @@
-import { Bell, Download, X } from "lucide-react";
+import { Bell, Download, X, FilePenLine } from "lucide-react";
 import { Button } from "@/components/ui";
 import { formatDueDate } from "@/utils/formatters";
 import { AGREEMENT_STATUS } from "../agreementStatus";
@@ -6,6 +6,8 @@ import { getPerson, getReminderLabel } from "../agreementSelectors";
 import { ActivityHistory } from "./ActivityHistory";
 import { SigningTimeline } from "./SigningTimeline";
 import { StatusBadge } from "./StatusBadge";
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 
 function DetailItem({ label, children, mono = false }) {
   return (
@@ -23,7 +25,7 @@ function DetailItem({ label, children, mono = false }) {
 export function AgreementDetailPanel({ agreement, onClose }) {
   const reminderLabel = getReminderLabel(agreement);
   const canVoid = agreement.status === AGREEMENT_STATUS.AWAITING;
-
+  const canEdit = agreement.status === AGREEMENT_STATUS.DRAFT;
   return (
     <div className="space-y-6 p-6">
       <header className="flex items-start justify-between gap-4">
@@ -43,9 +45,9 @@ export function AgreementDetailPanel({ agreement, onClose }) {
 
       <dl className="grid grid-cols-2 gap-4 border-b border-line pb-6">
         <DetailItem label="Sent by">
-         {agreement.senderName ??
-  getPerson(agreement.senderId)?.name ??
-  "Unknown"}
+          {agreement.senderName ??
+            getPerson(agreement.senderId)?.name ??
+            "Unknown"}
         </DetailItem>
         <DetailItem label="Due">
           {agreement.dueAt ? formatDueDate(agreement.dueAt) : "—"}
@@ -71,6 +73,15 @@ export function AgreementDetailPanel({ agreement, onClose }) {
           Download PDF
         </Button>
         {canVoid && <Button variant="danger">Void document</Button>}
+        {canEdit && (
+          <Button
+            as={Link}
+            to={ROUTES.prepareEnvelope(agreement.id)}
+            icon={FilePenLine}
+          >
+            Continue editing
+          </Button>
+        )}
       </div>
 
       <ActivityHistory events={agreement.history} />

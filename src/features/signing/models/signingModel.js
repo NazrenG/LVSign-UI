@@ -97,6 +97,8 @@ export const RECIPIENT_STATUS = {
   DELEGATED: "delegated",
   SKIPPED: "skipped",
   CANCELED: "canceled",
+  WAITING_FOR_CONDITION: "waitingForCondition",
+  SENT: "sent",
 };
 
 /** Why the recipient can or cannot sign right now (utils/signingAccess.js). */

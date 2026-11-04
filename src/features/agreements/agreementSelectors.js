@@ -35,6 +35,8 @@ export function getSignerCaption(signer, { isCurrentUser = false } = {}) {
       return "Not sent";
     case SIGNER_STATE.DECLINED:
       return "Declined";
+    case SIGNER_STATE.SKIPPED:
+      return "Skipped";
     default:
       return "Not yet";
   }
@@ -47,7 +49,7 @@ export function getWaitingSummary(agreement) {
   const remaining = agreement.signers.filter(
     (signer) => signer.state === SIGNER_STATE.PENDING,
   ).length;
-  const name = current.name ?? getPerson(current.personId)?.name ??  "Unknown";
+  const name = current.name ?? getPerson(current.personId)?.name ?? "Unknown";
   if (remaining === 0) return `Waiting for ${name}`;
   return `Waiting for ${name} and ${remaining} other${remaining === 1 ? "" : "s"}`;
 }
@@ -57,10 +59,7 @@ export const getReminderLabel = (agreement) => {
 
   if (!current) return null;
 
-  const name =
-    current.name ??
-    getPerson(current.personId)?.name ??
-    "Unknown";
+  const name = current.name ?? getPerson(current.personId)?.name ?? "Unknown";
 
   return `Remind ${getFirstName(name)}`;
 };

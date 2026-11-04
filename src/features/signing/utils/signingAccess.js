@@ -28,13 +28,13 @@ export function getSigningAccess(session, now = new Date()) {
   )
     return SIGNING_ACCESS.EXPIRED;
   if (
-    [RECIPIENT_STATUS.CREATED, RECIPIENT_STATUS.PENDING].includes(
+    [RECIPIENT_STATUS.CREATED, RECIPIENT_STATUS.PENDING,RECIPIENT_STATUS.WAITING_FOR_CONDITION].includes(
       recipient.status,
     )
   )
     return SIGNING_ACCESS.NOT_YOUR_TURN;
   if (
-    ![RECIPIENT_STATUS.ACTIVE, RECIPIENT_STATUS.VIEWED].includes(
+    ![RECIPIENT_STATUS.SENT,RECIPIENT_STATUS.ACTIVE, RECIPIENT_STATUS.VIEWED].includes(
       recipient.status,
     )
   )

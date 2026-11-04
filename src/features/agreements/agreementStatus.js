@@ -13,6 +13,7 @@ export const SIGNER_STATE = {
   PENDING: "pending",
   NOT_SENT: "notSent",
   DECLINED: "declined",
+  SKIPPED: "skipped"
 };
 
 /** Visual tone + label for every agreement status (drives <StatusBadge />). */
@@ -41,4 +42,5 @@ export const SIGNER_STEP_STATE = {
   [SIGNER_STATE.PENDING]: "pending",
   [SIGNER_STATE.NOT_SENT]: "pending",
   [SIGNER_STATE.DECLINED]: "danger",
+  [SIGNER_STATE.SKIPPED]: "skipped"
 };

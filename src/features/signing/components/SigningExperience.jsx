@@ -44,6 +44,7 @@ export function SigningExperience({ signing }) {
     actions,
     phase,
     submitError,
+    fieldSave,
   } = signing;
   const navigate = useNavigate();
   const scrollRef = useRef(null);
@@ -105,7 +106,8 @@ export function SigningExperience({ signing }) {
       actions.focusField(field.id);
       const reusable = adopted[field.fieldType];
       if (reusable && !values[field.id] && field.fieldType !== "stamp") {
-        actions.applyMark(field.id, field.fieldType, reusable);
+        void actions.applyMark(field.id, field.fieldType, reusable);
+
         return;
       }
       setMarkDialog({ field });
@@ -123,14 +125,21 @@ export function SigningExperience({ signing }) {
   );
 
   const closeMark = () => setMarkDialog(null);
-  const applyMark = (mark) => {
+  const applyMark = async (mark) => {
     const { field } = markDialog;
-    actions.applyMark(field.id, field.fieldType, mark);
-    closeMark();
+
+    const success = await actions.applyMark(field.id, field.fieldType, mark);
+
+    if (success) {
+      closeMark();
+    }
   };
-  const removeMark = () => {
-    actions.clearValue(markDialog.field.id);
-    closeMark();
+  const removeMark = async () => {
+    const success = await actions.removeMark(markDialog.field.id);
+
+    if (success) {
+      closeMark();
+    }
   };
 
   const openFinish = () => setIsFinishOpen(true);
@@ -159,16 +168,25 @@ export function SigningExperience({ signing }) {
   const markField = markDialog?.field;
   const markDialogProps = {
     isOpen: Boolean(markField),
+
     recipientName: session.recipient.name,
+
     currentMark:
       markField && isFieldComplete(markField, values[markField.id])
         ? values[markField.id]
         : null,
+
     onAdopt: applyMark,
+
     onRemove: removeMark,
+
     onClose: closeMark,
   };
-
+  useEffect(() => {
+    if (phase === SIGNING_PHASE.COMPLETED) {
+      setIsFinishOpen(false);
+    }
+  }, [phase]);
   return (
     <div className="flex h-dvh flex-col bg-canvas">
       <SigningHeader
@@ -179,6 +197,14 @@ export function SigningExperience({ signing }) {
         onFinish={openFinish}
         menuItems={menuItems}
       />
+      {fieldSave.error && (
+        <div
+          role="alert"
+          className="border-b border-danger/20 bg-danger-soft px-4 py-2 text-center text-[13px] text-danger"
+        >
+          Some changes could not be saved. Please try editing the field again.
+        </div>
+      )}
 
       <div className="flex min-h-0 flex-1">
         <aside className="hidden w-[208px] shrink-0 overflow-y-auto border-r border-line px-3 py-5 lg:block">

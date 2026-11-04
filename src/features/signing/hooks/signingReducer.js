@@ -12,6 +12,15 @@ export const initialSigningState = {
   phase: SIGNING_PHASE.SIGNING,
   result: null,
   submitError: null,
+  fieldSave: {
+    pending: 0,
+    error: null,
+  },
+  markSave: {
+    fieldId: null,
+    isSaving: false,
+    error: null,
+  },
 };
 
 export function signingReducer(state, action) {
@@ -21,9 +30,19 @@ export function signingReducer(state, action) {
     case "loaded":
       return {
         ...state,
-        load: { status: "ready", error: null },
+        load: {
+          status: "ready",
+          error: null,
+        },
         session: action.session,
+
         values: action.values,
+
+        phase: action.terminalStatus ?? SIGNING_PHASE.SIGNING,
+
+        loading: false,
+
+        error: null,
       };
     case "loadFailed":
       return { ...state, load: { status: "error", error: action.error } };
@@ -69,7 +88,75 @@ export function signingReducer(state, action) {
       };
     case "declined":
       return { ...state, phase: SIGNING_PHASE.DECLINED, result: action.result };
+    case "fieldSaveStarted":
+      return {
+        ...state,
 
+        fieldSave: {
+          pending: state.fieldSave.pending + 1,
+
+          error: null,
+        },
+      };
+
+    case "fieldSaveSucceeded":
+      return {
+        ...state,
+
+        fieldSave: {
+          ...state.fieldSave,
+
+          pending: Math.max(0, state.fieldSave.pending - 1),
+        },
+      };
+
+    case "fieldSaveFailed":
+      return {
+        ...state,
+
+        fieldSave: {
+          pending: Math.max(0, state.fieldSave.pending - 1),
+
+          error: action.error,
+        },
+      };
+
+    case "markSaveStarted":
+      return {
+        ...state,
+
+        markSave: {
+          fieldId: action.fieldId,
+
+          isSaving: true,
+
+          error: null,
+        },
+      };
+
+    case "markSaveSucceeded":
+      return {
+        ...state,
+
+        markSave: {
+          fieldId: null,
+          isSaving: false,
+          error: null,
+        },
+      };
+
+    case "markSaveFailed":
+      return {
+        ...state,
+
+        markSave: {
+          fieldId: action.fieldId,
+
+          isSaving: false,
+
+          error: action.error,
+        },
+      };
     default:
       throw new Error(`Unknown signing action: ${action.type}`);
   }

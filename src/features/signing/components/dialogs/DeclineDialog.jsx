@@ -19,7 +19,8 @@ export function DeclineDialog({ isOpen, senderName, onDecline, onClose }) {
   const submit = async () => {
     setState({ isSending: true, error: null });
     try {
-      await onDecline(reason.trim());
+      const success = await onDecline(reason.trim());
+      if (success) onClose();
     } catch (error) {
       setState({ isSending: false, error: error.message });
     }

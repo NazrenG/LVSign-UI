@@ -9,8 +9,9 @@ import {
 } from "@/components/ui";
 import { ROUTING_MODE } from "../../models/envelopeModel";
 import { RECIPIENT_TYPES } from "../../models/recipientTypes";
-import { useState,useRef } from "react";
+import { useState, useRef } from "react";
 import { isClientId } from "../../api/clientIds";
+import { toast } from "sonner";
 
 const TYPE_OPTIONS = Object.entries(RECIPIENT_TYPES).map(
   ([value, { label, icon }]) => ({ value, label, icon }),
@@ -82,12 +83,24 @@ export function RecipientDialog({
 
       await commands.saveRecipient(draftRecipient);
 
+      toast.success(
+        isNewRecipient
+          ? "Recipient added successfully."
+          : "Recipient updated successfully.",
+      );
       onClose();
     } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Recipient could not be saved.";
+
       setSaveState({
         isSaving: false,
-        error: error.message ?? "Recipient could not be saved.",
+        error: "",
       });
+
+      toast.error(message);
     } finally {
       requestInFlightRef.current = false;
     }
@@ -129,18 +142,24 @@ export function RecipientDialog({
       });
 
       await commands.removeRecipient(recipient.id);
-
+      toast.success("Recipient removed successfully.");
       onClose();
     } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Recipient could not be removed.";
+
       setSaveState({
         isSaving: false,
-        error: error.message ?? "Recipient could not be removed.",
+        error: "",
       });
+
+      toast.error(message);
     } finally {
       requestInFlightRef.current = false;
     }
   };
-
   return (
     <Dialog
       isOpen
@@ -163,9 +182,6 @@ export function RecipientDialog({
           >
             {saveState.isSaving ? "Working…" : "Remove recipient"}
           </Button>
-          {saveState.error && (
-            <p className="mr-auto text-[13px] text-danger">{saveState.error}</p>
-          )}
 
           <Button
             onClick={save}

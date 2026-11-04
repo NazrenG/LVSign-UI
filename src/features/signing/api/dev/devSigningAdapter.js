@@ -2,10 +2,7 @@ import {
   SigningAccessDeniedError,
   SigningSessionNotFoundError,
 } from "../signingErrors";
-import {
-  fromSigningSessionDto,
-  toCompleteSigningDto,
-} from "../../mappers/signingMapper";
+import { fromSigningSessionDto } from "../../mappers/signingMapper";
 import { DEV_ENVELOPES, LEGACY_IDS, buildSeed } from "./devSigningSeed";
 
 /**
@@ -29,49 +26,110 @@ function find(envelopeId) {
 export const devSigningAdapter = {
   async getSession(envelopeId) {
     await delay();
+
     return fromSigningSessionDto(clone(find(envelopeId)));
   },
 
-  async completeSigning(session, values) {
+  async applyMark(envelopeId, field, mark) {
+    await delay(250);
+
+    return {
+      id: crypto.randomUUID(),
+
+      sourceId: mark?.sourceId ?? crypto.randomUUID(),
+
+      kind:
+        field.fieldType === "signature"
+          ? 1
+          : field.fieldType === "initials"
+            ? 2
+            : 3,
+
+      appliedAt: new Date().toISOString(),
+    };
+  },
+
+  async removeMark() {
+    await delay(200);
+  },
+
+  async saveFieldValue(envelopeId, field, value) {
+    await delay(200);
+
+    return {
+      fieldId: field.id,
+
+      value,
+
+      filledAt: new Date().toISOString(),
+    };
+  },
+
+  async completeSigning(session) {
     await delay(700);
+
     const dto = find(session.envelopeId);
-    const body = toCompleteSigningDto(session, values);
-    const valueById = Object.fromEntries(
-      body.fields.map((item) => [item.fieldId, item.value]),
-    );
+
     const now = new Date().toISOString();
 
-    const envelopeStatus =
-      dto.remainingRecipients > 0 ? "inProgress" : "completed";
+    const isEnvelopeCompleted = (dto.remainingRecipients ?? 0) <= 0;
+
+    const envelopeStatus = isEnvelopeCompleted ? "completed" : "inProgress";
+
     store.set(dto.envelopeId, {
       ...dto,
+
       envelopeStatus,
-      recipient: { ...dto.recipient, status: "completed" },
-      fields: dto.fields.map((field) =>
-        field.id in valueById
-          ? { ...field, value: valueById[field.id], completedAt: now }
-          : field,
-      ),
+
+      recipient: {
+        ...dto.recipient,
+
+        status: "completed",
+
+        completedAt: now,
+      },
     });
+
     return {
+      recipientId: dto.recipient.id,
+
       recipientStatus: "completed",
+
       envelopeStatus,
-      remainingRecipients: dto.remainingRecipients,
+
+      isEnvelopeCompleted,
+
+      currentRoutingOrder: isEnvelopeCompleted
+        ? null
+        : dto.recipient.routingOrder + 1,
+
+      completedAt: now,
     };
   },
 
   async declineSigning(session, reason) {
     await delay(500);
+
     const dto = find(session.envelopeId);
+
     store.set(dto.envelopeId, {
       ...dto,
+
       envelopeStatus: "declined",
+
       recipient: {
         ...dto.recipient,
+
         status: "declined",
+
         declineReason: reason,
       },
     });
-    return { recipientStatus: "declined", envelopeStatus: "declined" };
+
+    return {
+      recipientStatus: "declined",
+
+      envelopeStatus: "declined",
+    };
   },
 };

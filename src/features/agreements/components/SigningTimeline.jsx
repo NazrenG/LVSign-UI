@@ -15,6 +15,8 @@ function getTimelineCaption(signer) {
       return `Waiting since ${formatDateTime(signer.date)}`;
     case SIGNER_STATE.DECLINED:
       return `Declined ${formatDateTime(signer.date)}`;
+    case SIGNER_STATE.SKIPPED:
+      return "Skipped";
     case SIGNER_STATE.NOT_SENT:
       return "Not sent";
     default:
@@ -24,17 +26,17 @@ function getTimelineCaption(signer) {
 
 /** Vertical signing route used in the agreement detail panel. */
 export function SigningTimeline({ agreement }) {
- const steps = agreement.signers.map((signer) => {
-  const person = getPerson(signer.personId);
+  const steps = agreement.signers.map((signer) => {
+    const person = getPerson(signer.personId);
 
-  return {
-    key: signer.recipientId ?? signer.personId,
-    title: signer.name ?? person?.name ?? "Unknown",
-    subtitle: person?.title,
-    caption: getTimelineCaption(signer),
-    state: SIGNER_STEP_STATE[signer.state],
-  };
-});
+    return {
+      key: signer.recipientId ?? signer.personId,
+      title: signer.name ?? person?.name ?? "Unknown",
+      subtitle: person?.title,
+      caption: getTimelineCaption(signer),
+      state: SIGNER_STEP_STATE[signer.state],
+    };
+  });
 
   const isComplete = agreement.status === AGREEMENT_STATUS.COMPLETED;
 

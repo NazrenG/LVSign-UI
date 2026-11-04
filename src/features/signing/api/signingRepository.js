@@ -16,5 +16,5 @@ import { devSigningAdapter } from "./dev/devSigningAdapter";
  */
 export const signingRepository =
   import.meta.env.VITE_SIGNING_SOURCE === "api"
-    ? apiSigningAdapter
-    : devSigningAdapter;
+    ? devSigningAdapter
+    : apiSigningAdapter;

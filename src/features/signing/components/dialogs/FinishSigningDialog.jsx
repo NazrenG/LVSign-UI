@@ -32,7 +32,7 @@ export function FinishSigningDialog({
             Keep reviewing
           </Button>
           <Button onClick={onConfirm} disabled={isSubmitting}>
-            {isSubmitting ? "Submitting…" : "Finish signing"}
+            {isSubmitting ? "Finishing..." : "Finish signing"}
           </Button>
         </>
       }
