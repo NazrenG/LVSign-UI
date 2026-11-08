@@ -46,7 +46,7 @@ export function useEnvelopeEditor({
   const loadedIdRef = useRef(null);
   const sendInFlightRef = useRef(false); //for double click
   const documentActionsInFlightRef = useRef(new Set());
-
+  const newEnvelopeRequestRef = useRef(null);
   useEffect(() => {
     let isCurrent = true;
 
@@ -116,33 +116,88 @@ export function useEnvelopeEditor({
   }, [envelope, loadState.status, actions]);
 
   useEffect(() => {
-    if (envelopeId === loadedIdRef.current) return undefined;
-    let isCurrent = true;
-    setLoadState({ status: "loading", error: null });
+    if (envelopeId === loadedIdRef.current) {
+      return undefined;
+    }
 
-    const request =
-      envelopeId === "new"
-        ? envelopeRepository.createEnvelope({ title: "Untitled envelope" })
-        : envelopeRepository.getEnvelope(envelopeId);
+    let isCurrent = true;
+
+    setLoadState({
+      status: "loading",
+      error: null,
+    });
+
+    let request;
+
+    if (envelopeId === "new") {
+      /*
+       * React StrictMode development-da effect-i
+       * setup → cleanup → setup şəklində yenidən
+       * işə sala bilər.
+       *
+       * POST-u ikinci dəfə göndərmirik.
+       * Eyni Promise reuse olunur.
+       */
+      if (!newEnvelopeRequestRef.current) {
+        newEnvelopeRequestRef.current = envelopeRepository.createEnvelope({
+          title: "Untitled envelope",
+        });
+      }
+
+      request = newEnvelopeRequestRef.current;
+    } else {
+      request = envelopeRepository.getEnvelope(envelopeId);
+    }
 
     request
       .then((loaded) => {
-        if (!isCurrent) return;
+        if (!isCurrent) {
+          return;
+        }
+
         loadedIdRef.current = loaded.id;
+
         actions.load(loaded);
+
         setActiveDocumentId((current) =>
           loaded.documents.some((document) => document.id === current)
             ? current
             : (loaded.documents[0]?.id ?? null),
         );
+
         setActiveRecipientId(getFieldOwners(loaded)[0]?.id ?? null);
-        setLoadState({ status: "ready", error: null });
-        if (loaded.id !== envelopeId) onIdResolved?.(loaded.id);
+
+        setLoadState({
+          status: "ready",
+          error: null,
+        });
+
+        /*
+         * /new/prepare
+         * →
+         * /{realGuid}/prepare
+         */
+        if (loaded.id !== envelopeId) {
+          onIdResolved?.(loaded.id);
+        }
       })
       .catch((error) => {
-        if (!isCurrent) return;
+        if (!isCurrent) {
+          return;
+        }
+
+        /*
+         * Create request fail olsa,
+         * növbəti retry yeni request
+         * yarada bilsin.
+         */
+        if (envelopeId === "new") {
+          newEnvelopeRequestRef.current = null;
+        }
+
         setLoadState({
           status: error instanceof EnvelopeNotFoundError ? "notFound" : "error",
+
           error,
         });
       });
@@ -150,7 +205,8 @@ export function useEnvelopeEditor({
     return () => {
       isCurrent = false;
     };
-    // onIdResolved is intentionally not a dependency: it only navigates.
+
+    // onIdResolved yalnız route-u real id-yə dəyişir.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [envelopeId, actions]);
 

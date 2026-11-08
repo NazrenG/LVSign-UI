@@ -3,16 +3,24 @@
  * a signing screen opens, so the rest of the app pays nothing for them.
  */
 export const SIGNATURE_FONTS = [
-  { key: "great-vibes", label: "Flowing", family: "'Great Vibes', cursive" },
+  {
+    key: "great-vibes",
+    label: "Flowing",
+    family: '"LV Great Vibes", cursive',
+  },
   {
     key: "mrs-saint-delafield",
     label: "Formal",
-    family: "'Mrs Saint Delafield', cursive",
+    family: '"LV Mrs Saint Delafield", cursive',
   },
-  { key: "caveat", label: "Casual", family: "'Caveat', cursive" },
+  {
+    key: "caveat",
+    label: "Casual",
+    family: '"LV Caveat", cursive',
+  },
 ];
 
-export const DEFAULT_SIGNATURE_FONT = SIGNATURE_FONTS[0].key;
+export const DEFAULT_SIGNATURE_FONT = "great-vibes";
 
 export const getSignatureFont = (key) =>
   SIGNATURE_FONTS.find((font) => font.key === key) ?? SIGNATURE_FONTS[0];
@@ -26,11 +34,10 @@ export function loadSignatureFonts() {
   link.id = STYLESHEET_ID;
   link.rel = "stylesheet";
   link.href =
-    "https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Great+Vibes&family=Mrs+Saint+Delafield&display=swap";
+    "https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Great+Vibes&family=Mrs+Saint+Delafield&display=swap";
   document.head.appendChild(link);
 }
-
-/** "Nazrin Guliyeva" → "NG" */
+ 
 export const toInitials = (name = "") =>
   name
     .split(/\s+/)

@@ -204,6 +204,37 @@ function fromAppliedSignatureDto(
     };
   }
 
+  /*
+   * Typed signature/initial:
+   * immutable snapshot DTO-dan bərpa olunur.
+   */
+  const signatureType =
+    typeof dto.signatureTypeSnapshot === "string"
+      ? dto.signatureTypeSnapshot.charAt(0).toLowerCase() +
+        dto.signatureTypeSnapshot.slice(1)
+      : dto.signatureTypeSnapshot === 2
+        ? "typed"
+        : dto.signatureTypeSnapshot === 1
+          ? "drawn"
+          : null;
+
+  if (signatureType === "typed" && dto.typedTextSnapshot) {
+    return {
+      method: "typed",
+
+      sourceId: dto.sourceSignatureId,
+
+      typedText: dto.typedTextSnapshot,
+
+      fontKey: dto.fontKeySnapshot ?? "great-vibes",
+
+      appliedAt: dto.appliedAt,
+    };
+  }
+
+  /*
+   * Drawn/saved image signature.
+   */
   const sourceList =
     fieldType === "initials" ? sources.savedInitials : sources.savedSignatures;
 
@@ -214,7 +245,7 @@ function fromAppliedSignatureDto(
   return {
     ...(signature ?? {}),
 
-    method: "saved",
+    method: signatureType === "drawn" ? "drawn" : "saved",
 
     sourceId: dto.sourceSignatureId,
 
@@ -223,6 +254,7 @@ function fromAppliedSignatureDto(
     appliedAt: dto.appliedAt,
   };
 }
+
 const MARK_FIELD_TYPES = ["signature", "initials", "stamp"];
 /** "Completed" / 4 / "completed" → "completed" */
 function toEnum(value, byNumber, fallback) {
@@ -394,7 +426,7 @@ export function fromSigningSessionDto(dto, { apiBaseUrl = "" } = {}) {
     ),
   };
 }
- 
+
 export function toCompleteSigningDto(session, values) {
   return {
     recipientId: session.recipient.id,

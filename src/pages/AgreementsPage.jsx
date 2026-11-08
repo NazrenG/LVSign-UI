@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ListFilter, Send } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/layout";
@@ -28,80 +28,58 @@ export function AgreementsPage() {
 
   const isDesktop = useIsAtLeast("2xl");
 
-  useEffect(() => {
-    async function loadAgreements() {
-      try {
-        setIsLoading(true);
-        setError("");
+  const loadAgreements = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError("");
 
-        const data = await getAgreements();
+      const data = await getAgreements();
 
-        setAgreements(data);
-      } catch (err) {
-        console.error(err);
+      setAgreements(data);
+    } catch (err) {
+      console.error(err);
 
-        setError("Agreements could not be loaded.");
-      } finally {
-        setIsLoading(false);
-      }
+      setError("Agreements could not be loaded.");
+    } finally {
+      setIsLoading(false);
     }
-
-    loadAgreements();
   }, []);
 
+  useEffect(() => {
+    loadAgreements();
+  }, [loadAgreements]);
+
   const selectedId =
-    searchParams.get("selected") ??
-    (isDesktop ? agreements[0]?.id : null);
+    searchParams.get("selected") ?? (isDesktop ? agreements[0]?.id : null);
 
   const selectedAgreement = agreements.find(
     (agreement) => agreement.id === selectedId,
   );
 
-  const isDrawerOpen =
-    Boolean(selectedAgreement) && !isDesktop;
+  const isDrawerOpen = Boolean(selectedAgreement) && !isDesktop;
 
   useLockBodyScroll(isDrawerOpen);
 
-  const counts = useMemo(
-    () => countByStatus(agreements),
-    [agreements],
-  );
+  const counts = useMemo(() => countByStatus(agreements), [agreements]);
 
-  const visibleAgreements = filterAgreements(
-    agreements,
-    {
-      status,
-      query,
-    },
-  );
+  const visibleAgreements = filterAgreements(agreements, {
+    status,
+    query,
+  });
 
   const selectAgreement = (id) =>
-    setSearchParams(
-      { selected: id },
-      { replace: true },
-    );
+    setSearchParams({ selected: id }, { replace: true });
 
   const closeDetails = () =>
-    setSearchParams(
-      { selected: "" },
-      { replace: true },
-    );
+    setSearchParams({ selected: "" }, { replace: true });
 
   // BUNLAR bütün hook-lardan SONRA olmalıdır
   if (isLoading) {
-    return (
-      <div className="p-6 text-ink-muted">
-        Loading agreements...
-      </div>
-    );
+    return <div className="p-6 text-ink-muted">Loading agreements...</div>;
   }
 
   if (error) {
-    return (
-      <div className="p-6 text-danger">
-        {error}
-      </div>
-    );
+    return <div className="p-6 text-danger">{error}</div>;
   }
   return (
     <>
@@ -156,6 +134,7 @@ export function AgreementsPage() {
               <AgreementDetailPanel
                 agreement={selectedAgreement}
                 onClose={closeDetails}
+                onChanged={loadAgreements}
               />
             </aside>
           </>
