@@ -8,6 +8,7 @@ export const ROUTES = {
   templateBuilder: (id = ":templateId") => `/templates/${id}/edit`,
   insights: "/insights",
   admin: "/admin",
+  notifications:"/settings/notifications",
   /**
    * Prepare Document editor for an envelope. Use "new" to start a draft;
    * add ?document=<documentId> to open a specific document.

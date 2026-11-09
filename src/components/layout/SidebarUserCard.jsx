@@ -1,7 +1,8 @@
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 export function SidebarUserCard({ user }) {
   return (
@@ -11,13 +12,23 @@ export function SidebarUserCard({ user }) {
         <p className="truncate text-[15px] font-medium text-ink">{user.name}</p>
         <p className="text-xs text-ink-muted">{user.department}</p>
       </div>
-      <Link
-        to={ROUTES.login}
-        className="rounded-md p-2 text-ink-muted transition-colors hover:bg-canvas-muted hover:text-ink"
-        aria-label="Sign out"
-      >
-        <LogOut className="size-[18px]" strokeWidth={1.5} />
-      </Link>
+      <div className="flex items-center">
+        <NotificationBell userId={user.apiUserId} />
+        <Link
+          to={ROUTES.notifications}
+          className="rounded-md p-2 text-ink-muted transition-colors hover:bg-canvas-muted hover:text-ink"
+          aria-label="Notification settings"
+        >
+          <Settings className="size-[18px]" strokeWidth={1.5} />
+        </Link>
+        <Link
+          to={ROUTES.login}
+          className="rounded-md p-2 text-ink-muted transition-colors hover:bg-canvas-muted hover:text-ink"
+          aria-label="Sign out"
+        >
+          <LogOut className="size-[18px]" strokeWidth={1.5} />
+        </Link>
+      </div>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { TemplateBuilderPage } from "@/pages/TemplateBuilderPage";
 import { TemplateDetailPage } from "@/pages/TemplateDetailPage";
 import { TemplatesPage } from "@/pages/TemplatesPage";
+import { NotificationSettingsPage } from "@/pages/NotificationSettingsPage";
 
 export const router = createBrowserRouter([
   { path: ROUTES.login, element: <LoginPage /> },
@@ -46,4 +47,8 @@ export const router = createBrowserRouter([
   },
   { path: ROUTES.signDocument(), element: <LegacyDocumentSignRedirect /> },
   { path: "*", element: <NotFoundPage /> },
+  {
+    path: ROUTES.notifications,
+    element: <NotificationSettingsPage />,
+  },
 ]);
