@@ -92,18 +92,21 @@ export function NotificationSettingsPage() {
     };
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-9 lg:py-9">
       <PageHeader
         title="Notification settings"
         subtitle="Manage how and when LV SignFlow sends you notifications."
       />
 
       {loading ? (
-        <div className="py-12 text-center text-sm text-ink-muted">
+        <div
+          role="status"
+          className="rounded-md border border-line bg-surface px-6 py-16 text-center text-sm text-ink-muted"
+        >
           Loading settings...
         </div>
       ) : (
-        <div className="max-w-3xl">
+        <div>
           <NotificationSettings
             preferences={
               preferences
@@ -118,6 +121,6 @@ export function NotificationSettingsPage() {
           />
         </div>
       )}
-    </>
+    </div>
   );
 }
