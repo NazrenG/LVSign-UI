@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { cn } from "@/utils/cn";
-import { useFieldDrag } from "../../hooks/useFieldDrag";
-import { FIELD_TYPES } from "../../models/fieldTypes";
+import { useFieldDrag } from "@/hooks/useFieldDrag";import { FIELD_TYPES } from "../../models/fieldTypes";
 import { UNASSIGNED_COLORS } from "../../utils/recipientColors";
 import { recipientName } from "./RecipientDot";
 

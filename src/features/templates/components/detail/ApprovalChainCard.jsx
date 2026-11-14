@@ -1,47 +1,61 @@
-import { StepProgress } from "@/components/shared";
 import { Card, CardHeader } from "@/components/ui";
-import {
-  describeRoleStep,
-  getApprovalSteps,
-  getRole,
-} from "../../templateSelectors";
+
+function recipientTypeLabel(recipientType) {
+  switch (recipientType) {
+    case "approver":
+      return "Approver";
+
+    case "viewer":
+      return "Viewer";
+
+    case "copy":
+      return "Copy recipient";
+
+    default:
+      return "Signer";
+  }
+}
 
 export function ApprovalChainCard({ template }) {
-  const orderText =
-    template.signingOrder === "sequential"
-      ? "Signs in order"
-      : "Signs all at once";
+  const roles = [...template.roles].sort(
+    (a, b) => a.routingOrder - b.routingOrder,
+  );
 
   return (
     <Card className="p-5 sm:p-6">
       <CardHeader
-        title="Approval chain"
-        action={
-          <span className="text-[13px] text-ink-muted">
-            {orderText} · roles resolve when you send
-          </span>
-        }
-      />
-      <StepProgress
-        steps={getApprovalSteps(template)}
-        className="border-b border-line pb-6"
+        title="Recipient workflow"
+        description={`${roles.length} recipient role${roles.length === 1 ? "" : "s"} configured`}
       />
 
-      <dl className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {template.roles.map((roleStep) => (
-          <div key={roleStep.id}>
-            <dt className="text-[15px] font-medium text-ink">
-              {getRole(roleStep).name}
-            </dt>
-            <dd className="mt-1 text-[13px] text-ink-muted">
-              {roleStep.resolver}
-            </dd>
-            <dd className="text-[13px] text-ink-muted">
-              {describeRoleStep(roleStep)}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      {roles.length === 0 ? (
+        <p className="text-[15px] text-ink-muted">
+          No recipient roles have been configured.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {roles.map((role) => (
+            <div
+              key={role.id}
+              className="flex items-start gap-4 rounded-md border border-line bg-canvas-muted/40 p-4"
+            >
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-primary">
+                {role.routingOrder}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-medium text-ink">{role.name}</p>
+
+                <p className="mt-0.5 text-[13px] text-ink-muted">
+                  {recipientTypeLabel(role.recipientType)}
+                  {" · "}
+                  {role.isRequired ? "Required" : "Optional"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }

@@ -1,94 +1,198 @@
 import { GripVertical } from "lucide-react";
-import { Card, Menu, Select } from "@/components/ui";
-import { SIGNER_ROLES } from "@/data/templateRoles";
-import { pluralize } from "@/utils/formatters";
-import { ROLE_ACTIONS } from "../../../templateConstants";
-import { getRole, getStepLabel } from "../../../templateSelectors";
 
-/** Every resolver in the role library, plus the current one if it is custom. */
-const resolverOptions = (current) => {
-  const known = Object.values(SIGNER_ROLES).map((role) => role.resolver);
-  return known.includes(current) ? known : [current, ...known];
-};
+import { Card, Input, Menu, Select, SettingRow, Toggle } from "@/components/ui";
 
-function Detail({ label, value }) {
-  return (
-    <div className="flex justify-between gap-4 text-[15px]">
-      <dt className="text-ink-muted">{label}</dt>
-      <dd className="text-right text-ink">{value}</dd>
-    </div>
-  );
+const RECIPIENT_TYPES = [
+  {
+    value: 1,
+    label: "Signer",
+  },
+  {
+    value: 2,
+    label: "Approver",
+  },
+  {
+    value: 3,
+    label: "Viewer",
+  },
+  {
+    value: 4,
+    label: "Copy recipient",
+  },
+];
+
+function getRecipientTypeLabel(type) {
+  switch (Number(type)) {
+    case 2:
+      return "Approver";
+
+    case 3:
+      return "Viewer";
+
+    case 4:
+      return "Copy recipient";
+
+    default:
+      return "Signer";
+  }
 }
 
-export function RoleCard({ roleStep, index, total, isParallel, actions }) {
-  const role = getRole(roleStep);
-  const stepLabel = isParallel ? "Signer" : getStepLabel(index, total);
-
+export function RoleCard({
+  roleStep,
+  index,
+  total,
+  onChange,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+}) {
   return (
     <Card className="p-4 sm:p-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-2">
-          <GripVertical
-            className="mt-3 size-4 shrink-0 text-ink-subtle"
-            aria-hidden
-          />
-          <div>
-            <p className="text-[13px] text-ink-muted">
-              Step {index + 1} · {stepLabel}
-            </p>
-            <h3 className="text-base font-semibold text-ink">{role.name}</h3>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <GripVertical
+              className="mt-1 size-4 shrink-0 text-ink-subtle"
+              aria-hidden
+            />
+
+            <div className="min-w-0">
+              <p className="text-[13px] text-ink-muted">
+                Step {index + 1} · Routing order {roleStep.routingOrder}
+              </p>
+
+              <h3 className="truncate text-base font-semibold text-ink">
+                {roleStep.name || "Unnamed recipient"}
+              </h3>
+
+              <p className="mt-0.5 text-[13px] text-ink-muted">
+                {getRecipientTypeLabel(roleStep.recipientType)}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select
-            aria-label={`What ${role.name} does`}
-            options={ROLE_ACTIONS}
-            value={roleStep.action}
-            onChange={(event) =>
-              actions.updateRole(roleStep.id, { action: event.target.value })
-            }
-            wrapperClassName="flex-1 sm:w-56"
-          />
+
           <Menu
-            label={`${role.name} actions`}
+            label={`${roleStep.name || "Recipient"} actions`}
             items={[
               {
                 label: "Move up",
-                onSelect: () => actions.moveRole(roleStep.id, -1),
+                onSelect: onMoveUp,
                 disabled: index === 0,
               },
               {
                 label: "Move down",
-                onSelect: () => actions.moveRole(roleStep.id, 1),
+                onSelect: onMoveDown,
                 disabled: index === total - 1,
               },
               {
                 label: "Remove role",
-                onSelect: () => actions.removeRole(roleStep.id),
-                disabled: total === 1,
+                onSelect: onDelete,
                 tone: "danger",
               },
             ]}
           />
         </div>
-      </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:gap-5">
-        <Select
-          label="Who fills this role"
-          options={resolverOptions(roleStep.resolver)}
-          value={roleStep.resolver}
-          onChange={(event) =>
-            actions.updateRole(roleStep.id, { resolver: event.target.value })
-          }
-        />
-        <dl className="space-y-2 sm:pt-7">
-          <Detail label="Can delegate" value={roleStep.delegate} />
-          <Detail
-            label="Time to act"
-            value={pluralize(roleStep.timeToActDays, "working day")}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Role name"
+            value={roleStep.name ?? ""}
+            onChange={(event) =>
+              onChange({
+                name: event.target.value,
+              })
+            }
+            placeholder="e.g. Department manager"
           />
-        </dl>
+
+          <Select
+            label="Recipient type"
+            options={RECIPIENT_TYPES}
+            value={roleStep.recipientType}
+            onChange={(event) =>
+              onChange({
+                recipientType: Number(event.target.value),
+              })
+            }
+          />
+        </div>
+
+        <div className="border-t border-line pt-4">
+          <SettingRow
+            title="Required recipient"
+            description="This recipient must participate in the envelope workflow."
+            control={
+              <Toggle
+                label="Required recipient"
+                checked={roleStep.isRequired}
+                onChange={(isRequired) =>
+                  onChange({
+                    isRequired,
+                  })
+                }
+              />
+            }
+          />
+        </div>
+
+        <div className="space-y-4 border-t border-line pt-4">
+          <p className="text-[13px] font-medium text-ink-muted">
+            Sender permissions
+          </p>
+
+          <SettingRow
+            title="Can edit recipient"
+            description={
+              roleStep.defaultUserId
+                ? "The sender may replace or edit this recipient before sending."
+                : "A default user must be selected before this recipient can be locked."
+            }
+            control={
+              <Toggle
+                label="Sender can edit recipient"
+                checked={roleStep.allowSenderEditRecipient}
+                disabled={!roleStep.defaultUserId}
+                onChange={(value) =>
+                  onChange({
+                    allowSenderEditRecipient: value,
+                  })
+                }
+              />
+            }
+          />
+
+          <SettingRow
+            title="Can delete recipient"
+            description="The sender may remove this recipient before sending."
+            control={
+              <Toggle
+                label="Sender can delete recipient"
+                checked={roleStep.allowSenderDeleteRecipient}
+                onChange={(value) =>
+                  onChange({
+                    allowSenderDeleteRecipient: value,
+                  })
+                }
+              />
+            }
+          />
+
+          <SettingRow
+            title="Can change routing order"
+            description="The sender may change when this recipient receives the document."
+            control={
+              <Toggle
+                label="Sender can change routing order"
+                checked={roleStep.allowSenderChangeRoutingOrder}
+                onChange={(value) =>
+                  onChange({
+                    allowSenderChangeRoutingOrder: value,
+                  })
+                }
+              />
+            }
+          />
+        </div>
       </div>
     </Card>
   );

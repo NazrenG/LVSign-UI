@@ -1,5 +1,3 @@
-import { createRoleStep } from "@/data/templates";
-import { SIGNER_ROLES } from "@/data/templateRoles";
 import { FIELD_TYPES } from "../templateConstants";
 
 /**
@@ -17,6 +15,10 @@ export const DRAFT_ACTIONS = {
   UPDATE_FIELD: "updateField",
   REMOVE_FIELD: "removeField",
   MARK_SAVED: "markSaved",
+  SET_ROLES: "setRoles",
+  ADD_EXISTING_ROLE: "addExistingRole",
+  ADD_DOCUMENT: "addDocument",
+  ADD_EXISTING_FIELD: "addExistingField",
 };
 
 const nextUnusedRoleId = (roles) =>
@@ -51,15 +53,18 @@ export function templateDraftReducer(state, action) {
         [action.section]: { ...template[action.section], ...action.patch },
       });
 
-    case DRAFT_ACTIONS.ADD_ROLE: {
-      const roleId = nextUnusedRoleId(template.roles);
-      if (!roleId) return state;
-      return withTemplate(state, {
-        ...template,
-        roles: [...template.roles, createRoleStep(roleId)],
-      });
-    }
+    case DRAFT_ACTIONS.ADD_DOCUMENT:
+      return {
+        ...state,
 
+        template: {
+          ...template,
+
+          documents: [...(template.documents ?? []), action.document],
+        },
+
+        isDirty: false,
+      };
     case DRAFT_ACTIONS.UPDATE_ROLE:
       return withTemplate(state, {
         ...template,
@@ -117,6 +122,33 @@ export function templateDraftReducer(state, action) {
 
     case DRAFT_ACTIONS.MARK_SAVED:
       return { ...state, isDirty: false, savedAt: action.at };
+
+    case DRAFT_ACTIONS.SET_ROLES:
+      return {
+        ...state,
+        template: {
+          ...template,
+          roles: action.roles,
+        },
+      };
+
+    case DRAFT_ACTIONS.ADD_EXISTING_ROLE:
+      return withTemplate(state, {
+        ...template,
+        roles: [...template.roles, action.role],
+      });
+
+    case DRAFT_ACTIONS.ADD_EXISTING_FIELD:
+      return {
+        ...state,
+
+        template: {
+          ...template,
+          fields: [...(template.fields ?? []), action.field],
+        },
+
+        isDirty: false,
+      };
 
     default:
       throw new Error(`Unknown draft action: ${action.type}`);

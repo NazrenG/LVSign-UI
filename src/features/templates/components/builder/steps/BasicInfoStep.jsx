@@ -7,13 +7,8 @@ import {
   Select,
   Textarea,
 } from "@/components/ui";
-import { PEOPLE } from "@/data/people";
 import { TEMPLATE_CATEGORIES } from "../../../templateConstants";
-import { AccessPermissionsCard } from "../basic/AccessPermissionsCard";
-import { AudienceSummaryCard } from "../basic/AudienceSummaryCard";
 import { BuilderStepLayout } from "../BuilderStepLayout";
-
-const LANGUAGES = ["English", "Azərbaycan", "Русский"];
 
 const TIPS = [
   "Use a sentence-case name people will search for.",
@@ -22,7 +17,7 @@ const TIPS = [
 ];
 
 export function BasicInfoStep({ template, actions }) {
-  const owner = PEOPLE[template.ownerId];
+  const owner = null;
   const setValue = (key) => (event) =>
     actions.update({ [key]: event.target.value });
   const isPrefixLocked = template.version > 0;
@@ -33,7 +28,7 @@ export function BasicInfoStep({ template, actions }) {
       description="Name the template, choose where it lives and who is allowed to use or change it."
       aside={
         <>
-          <AudienceSummaryCard access={template.access} />
+          {/* <AudienceSummaryCard access={template.access} /> */}
           <NoteCard title="Before you continue" items={TIPS} />
         </>
       }
@@ -59,7 +54,7 @@ export function BasicInfoStep({ template, actions }) {
         />
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <Input
+          {/* <Input
             label="Document ID prefix"
             value={template.docPrefix}
             onChange={(event) =>
@@ -72,26 +67,29 @@ export function BasicInfoStep({ template, actions }) {
                 ? `Documents are numbered ${template.docPrefix}-2026-0001, -0002 …`
                 : "For example HR-LEAVE"
             }
-          />
-         
+          /> */}
+
           <Input
             label="Owner"
             icon={User}
-            value={owner ? `${owner.name} · ${owner.department}` : ""}
+            value={
+              owner
+                ? `${owner.name} · ${owner.department}`
+                : "Current template owner"
+            }
             readOnly
-            hint="Gets notified when the template fails or expires."
+            hint="Template owner"
           />
           <Input
             label="Source document"
             icon={FileText}
-            value={template.sourceDocument.name}
-            suffix={`${template.sourceDocument.pages} pages`}
+            value={template.documents?.[0]?.name ?? "No document uploaded"}
             readOnly
           />
         </div>
       </Card>
 
-      <AccessPermissionsCard template={template} actions={actions} />
+      {/* <AccessPermissionsCard template={template} actions={actions} /> */}
     </BuilderStepLayout>
   );
 }

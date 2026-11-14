@@ -1,21 +1,38 @@
 import { Copy, PenLine } from "lucide-react";
+
 import { Link } from "react-router-dom";
+
 import { Breadcrumbs, Button } from "@/components/ui";
+
 import { ROUTES } from "@/constants/routes";
-import { PEOPLE } from "@/data/people";
+
 import { formatDayMonthYear } from "@/utils/formatters";
+
 import { CategoryLabel } from "../list/CategoryLabel";
 
 export function TemplateDetailHeader({ template }) {
-  const updatedBy = PEOPLE[template.updatedBy]?.name;
+  const canEdit =
+    template.isOwner ||
+    ["edit", "manage"].includes(template.effectiveAccessLevel);
 
   return (
     <header className="mb-6">
       <Breadcrumbs
         items={[
-          { label: "Templates", to: ROUTES.templates },
-          { label: template.category },
-          { label: template.name },
+          {
+            label: "Templates",
+            to: ROUTES.templates,
+          },
+          ...(template.category
+            ? [
+                {
+                  label: template.category,
+                },
+              ]
+            : []),
+          {
+            label: template.name,
+          },
         ]}
       />
 
@@ -25,15 +42,22 @@ export function TemplateDetailHeader({ template }) {
             <h1 className="font-serif text-3xl text-ink sm:text-[34px]">
               {template.name}
             </h1>
-            <CategoryLabel category={template.category} />
+
+            {template.category && (
+              <CategoryLabel category={template.category} />
+            )}
           </div>
-          <p className="mt-2 text-[15px] text-ink-muted">
-            {template.description}
-          </p>
+
+          {template.description && (
+            <p className="mt-2 text-[15px] text-ink-muted">
+              {template.description}
+            </p>
+          )}
+
           <p className="mt-1 font-mono text-[13px] text-ink-muted">
-            Version {template.version} · {template.docPrefix} · updated{" "}
-            {formatDayMonthYear(template.updatedAt)}
-            {updatedBy && ` by ${updatedBy}`}
+            Version {template.latestVersionNumber}
+            {template.updatedAt &&
+              ` · updated ${formatDayMonthYear(template.updatedAt)}`}
           </p>
         </div>
 
@@ -46,14 +70,17 @@ export function TemplateDetailHeader({ template }) {
           >
             Duplicate
           </Button>
-          <Button
-            as={Link}
-            to={ROUTES.templateBuilder(template.id)}
-            variant="secondary"
-            icon={PenLine}
-          >
-            Edit template
-          </Button>
+
+          {canEdit && (
+            <Button
+              as={Link}
+              to={ROUTES.templateBuilder(template.id)}
+              variant="secondary"
+              icon={PenLine}
+            >
+              Edit template
+            </Button>
+          )}
         </div>
       </div>
     </header>

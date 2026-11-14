@@ -1,3 +1,5 @@
+export { templateRepository } from "./api/templateRepository";
+
 export * from "./templateConstants";
 export * from "./templateSelectors";
 export { getPublishChecks } from "./publishChecks";
@@ -21,3 +23,5 @@ export { BasicInfoStep } from "./components/builder/steps/BasicInfoStep";
 export { ExpiryRemindersStep } from "./components/builder/steps/ExpiryRemindersStep";
 export { FieldsStep } from "./components/builder/steps/FieldsStep";
 export { RolesWorkflowStep } from "./components/builder/steps/RolesWorkflowStep";
+
+

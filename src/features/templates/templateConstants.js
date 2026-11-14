@@ -32,11 +32,19 @@ export const getCategory = (value) =>
 /* ---------- list sorting ---------- */
 
 export const SORT_OPTIONS = [
-  { value: "mostUsed", label: "Most used" },
-  { value: "recent", label: "Recently updated" },
-  { value: "name", label: "Name A–Z" },
+  {
+    value: "recent",
+    label: "Recently updated",
+  },
+  {
+    value: "name",
+    label: "Name A–Z",
+  },
+  {
+    value: "version",
+    label: "Highest version",
+  },
 ];
-
 export const PAGE_SIZE = 9;
 
 /* ---------- fields ---------- */
