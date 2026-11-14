@@ -1,34 +1,31 @@
-import { useNavigate } from "react-router-dom";
-import { Logo } from "@/components/ui";
-import { ROUTES } from "@/constants/routes";
-import { LoginForm } from "@/features/auth/components/LoginForm";
-import { SignedDocumentPreview } from "@/features/auth/components/SignedDocumentPreview";
+import { AUTH_STATUS } from "@/features/auth/authStatus";
+import { authIntegration } from "@/features/auth/authIntegration";
+import { AuthLayout } from "@/features/auth/components/AuthLayout";
+import { MicrosoftSignInPanel } from "@/features/auth/components/MicrosoftSignInPanel";
 
+/**
+ * Sign-in with Microsoft Entra ID (UI only).
+ *
+ * The legacy department / email / password form (features/auth/components/
+ * LoginForm) is kept in the codebase until the Entra migration is complete,
+ * but is no longer shown. `status` and the actions will come from the MSAL
+ * integration; until then the button calls a clearly named placeholder that
+ * does not sign anyone in.
+ */
 export function LoginPage() {
-  const navigate = useNavigate();
-
-  // TODO: call the auth API; for now any submit signs the user in.
-  const handleSignIn = () => navigate(ROUTES.home);
+  const status = AUTH_STATUS.unauthenticated;
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[minmax(0,44%)_1fr]">
-      <main className="flex items-center px-4 py-12 sm:px-10 lg:px-16 xl:px-28">
-        <div className="w-full max-w-lg">
-          <Logo />
-          <h1 className="mt-10 font-serif text-4xl text-ink">Sign in</h1>
-          <p className="mt-3 mb-8 text-[15px] text-ink-muted">
-            Internal approvals for LV Logistics colleagues.
-          </p>
-          <LoginForm onSubmit={handleSignIn} />
-          <p className="mt-10 text-sm text-ink-muted">
-            Forgot your password? Contact the IT service desk.
-          </p>
-        </div>
-      </main>
-
-      <aside className="hidden items-center justify-center border-l border-line bg-canvas-muted p-12 lg:flex">
-        <SignedDocumentPreview />
-      </aside>
-    </div>
+    <AuthLayout footer="Need access? Contact your IT administrator.">
+      <h1 className="font-serif text-4xl text-ink">Welcome to LV.SignFlow</h1>
+      <p className="mt-3 mb-8 text-[15px] text-ink-muted">
+        Sign in securely with your LV Logistics work account.
+      </p>
+      <MicrosoftSignInPanel
+        status={status}
+        onSignIn={authIntegration.signInWithMicrosoft}
+        onRetry={authIntegration.retrySignIn}
+      />
+    </AuthLayout>
   );
 }

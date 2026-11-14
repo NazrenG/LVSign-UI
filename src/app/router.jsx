@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/components/layout";
 import { ROUTES } from "@/constants/routes";
+import { AccessDeniedPage } from "@/pages/AccessDeniedPage";
 import { AgreementsPage } from "@/pages/AgreementsPage";
 import { HomePage } from "@/pages/HomePage";
 import { LegacyDocumentEditRedirect } from "@/pages/LegacyDocumentEditRedirect";
@@ -8,6 +9,7 @@ import { LegacyDocumentSignRedirect } from "@/pages/LegacyDocumentSignRedirect";
 import { LoginPage } from "@/pages/LoginPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
+import { SessionExpiredPage } from "@/pages/SessionExpiredPage";
 import { TemplateBuilderPage } from "@/pages/TemplateBuilderPage";
 import { TemplateDetailPage } from "@/pages/TemplateDetailPage";
 import { TemplatesPage } from "@/pages/TemplatesPage";
@@ -15,6 +17,8 @@ import { NotificationSettingsPage } from "@/pages/NotificationSettingsPage";
 
 export const router = createBrowserRouter([
   { path: ROUTES.login, element: <LoginPage /> },
+  { path: ROUTES.accessDenied, element: <AccessDeniedPage /> },
+  { path: ROUTES.sessionExpired, element: <SessionExpiredPage /> },
   {
     // Pages with the sidebar
     element: <AppLayout />,

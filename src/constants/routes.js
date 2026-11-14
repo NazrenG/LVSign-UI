@@ -1,5 +1,8 @@
 export const ROUTES = {
   login: "/login",
+  /** Signed in with Microsoft, but not authorized for LV.SignFlow. */
+  accessDenied: "/access-denied",
+  sessionExpired: "/session-expired",
   home: "/",
   agreements: "/agreements",
   templates: "/templates",
