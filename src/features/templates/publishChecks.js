@@ -8,60 +8,60 @@ import { getRole, rolesWithoutSignature } from "./templateSelectors";
  * Publishing is allowed only when every check passes.
  */
 export function getPublishChecks(template) {
-  const usedBy = ACCESS_ROLES.filter(
-    (role) => template.access[role.id]?.use,
-  ).length;
-  const editedBy = ACCESS_ROLES.filter(
-    (role) => template.access[role.id]?.edit,
-  ).length;
-  const missingSignature = rolesWithoutSignature(template);
-  const mappedFields = template.fields.filter((field) => field.dataKey).length;
+  const hasName = Boolean(template.name?.trim());
 
-  const basicValid = Boolean(
-    template.name.trim() && template.docPrefix.trim() && usedBy,
+  const hasDocument = (template.documents?.length ?? 0) > 0;
+
+  const actionableRoles = (template.roles ?? []).filter((role) =>
+    [1, 2].includes(Number(role.recipientType)),
   );
-  const rolesValid = template.roles.length > 0;
-  const fieldsValid = missingSignature.length === 0;
-  const expiryValid = template.expiry.expiresAfterDays > 0;
+
+  const hasRoles = actionableRoles.length > 0;
+
+  const rolesWithFields = new Set(
+    (template.fields ?? [])
+      .filter((field) => field.recipientRoleId)
+      .map((field) => field.recipientRoleId),
+  );
+
+  const missingFields = actionableRoles.filter(
+    (role) => !rolesWithFields.has(role.id),
+  );
 
   return [
     {
       stepId: "basic",
       label: "Basic info",
-      isValid: basicValid,
-      summary: basicValid
-        ? `${template.category} · used by ${pluralize(usedBy, "role")}, edited by ${editedBy}`
-        : "Needs a name, a document ID prefix and at least one role that can use it",
+      isValid: hasName,
+      summary: hasName
+        ? "Template metadata is ready"
+        : "Template name is required",
     },
     {
       stepId: "roles",
       label: "Roles & workflow",
-      isValid: rolesValid,
-      summary: rolesValid
-        ? [
-            pluralize(template.roles.length, "signer role"),
-            template.signingOrder === "sequential" ? "in order" : "all at once",
-            ...(template.copyRecipients.length
-              ? [`copy to ${template.copyRecipients.join(", ")}`]
-              : []),
-          ].join(", ")
-        : "Add at least one signer role",
+      isValid: hasRoles,
+      summary: hasRoles
+        ? `${actionableRoles.length} signer/approver role(s)`
+        : "Add at least one signer or approver",
     },
     {
       stepId: "fields",
-      label: "Fields",
-      isValid: fieldsValid,
-      summary: fieldsValid
-        ? `${pluralize(template.fields.length, "field")}, ${mappedFields} mapped to data keys`
-        : `${missingSignature.map((roleStep) => getRole(roleStep).name).join(", ")} needs a signature field`,
+      label: "Document & fields",
+      isValid: hasDocument && missingFields.length === 0,
+      summary: !hasDocument
+        ? "Upload at least one document"
+        : missingFields.length > 0
+          ? `${missingFields.length} recipient role(s) still need a field`
+          : `${template.fields?.length ?? 0} field(s) configured`,
     },
     {
       stepId: "expiry",
       label: "Expiry & reminders",
-      isValid: expiryValid,
-      summary: expiryValid
-        ? describeExpiry(template.expiry)
-        : "Set when documents expire",
+      isValid: true,
+      summary: template.expirationDays
+        ? `Expires after ${template.expirationDays} days`
+        : "No expiry configured",
     },
   ];
 }

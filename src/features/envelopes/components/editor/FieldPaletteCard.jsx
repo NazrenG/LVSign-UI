@@ -41,7 +41,7 @@ export function FieldPaletteCard({
           <p className="mb-1.5 text-[13px] text-ink-muted">
             Placing fields for
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <RecipientDot colors={colorsById[activeRecipient?.id]} />
             <Select
               aria-label="Placing fields for"

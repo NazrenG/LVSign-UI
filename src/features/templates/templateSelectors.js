@@ -5,8 +5,17 @@ import { FIELD_TYPES, FILLER, FILLER_LABELS } from "./templateConstants";
 
 /* ---------- roles ---------- */
 
-export const getRole = (roleStep) => SIGNER_ROLES[roleStep.roleId];
+export const getRole = (roleStep) => ({
+  name: roleStep.name,
+  shortName: roleStep.name,
 
+  code: roleStep.name
+    ?.split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase(),
+});
 const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
 
 /** "1st approver" / "2nd approver" / "Final signer" */
@@ -173,44 +182,56 @@ export const findPersonByName = (name) =>
 
 /* ---------- list page ---------- */
 
+/* ---------- list page ---------- */
+
 export function countByCategory(templates) {
   return templates.reduce(
-    (counts, template) => ({
-      ...counts,
-      [template.category]: (counts[template.category] ?? 0) + 1,
-    }),
-    { all: templates.length },
+    (counts, template) => {
+      if (template.category) {
+        counts[template.category] = (counts[template.category] ?? 0) + 1;
+      }
+
+      counts.all = (counts.all ?? 0) + 1;
+
+      return counts;
+    },
+    { all: 0 },
   );
 }
 
 const SORTERS = {
-  mostUsed: (a, b) => b.stats.usesThisMonth - a.stats.usesThisMonth,
-  recent: (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+  recent: (a, b) => new Date(b.updatedAt ?? 0) - new Date(a.updatedAt ?? 0),
+
   name: (a, b) => a.name.localeCompare(b.name),
+
+  version: (a, b) => b.latestVersionNumber - a.latestVersionNumber,
 };
 
-/** Search matches the name, description, category and signer role names. */
 export function filterTemplates(templates, { category = "all", query = "" }) {
   const needle = query.trim().toLowerCase();
+
   return templates.filter((template) => {
-    if (template.hidden) return false;
-    if (category !== "all" && template.category !== category) return false;
-    if (!needle) return true;
+    if (category !== "all" && template.category !== category) {
+      return false;
+    }
+
+    if (!needle) {
+      return true;
+    }
+
     const haystack = [
       template.name,
       template.description,
       template.category,
-      ...template.roles.map((roleStep) => getRole(roleStep).name),
-      ...template.fields.map((field) => field.label),
+      template.status,
     ]
+      .filter(Boolean)
       .join(" ")
       .toLowerCase();
+
     return haystack.includes(needle);
   });
 }
 
 export const sortTemplates = (templates, sortKey) =>
-  [...templates].sort(SORTERS[sortKey] ?? SORTERS.mostUsed);
-
-export const getFrequentlyUsed = (templates, limit = 4) =>
-  sortTemplates(templates, "mostUsed").slice(0, limit);
+  [...templates].sort(SORTERS[sortKey] ?? SORTERS.recent);

@@ -16,6 +16,8 @@ export function BuilderHeader({
   onSave,
   onContinue,
   onPublish,
+  saving,
+  onCreateVersion,
 }) {
   const savedText = isDirty
     ? "unsaved changes"
@@ -39,10 +41,14 @@ export function BuilderHeader({
               <h1 className="truncate font-serif text-xl text-ink">
                 {template.name || "Untitled template"}
               </h1>
-              <Badge tone="neutral">Draft</Badge>
+              <Badge tone="neutral">
+                {template.latestVersionIsPublished ? "Published" : "Draft"}
+              </Badge>
             </div>
             <p className="font-mono text-[13px] text-ink-muted">
-              v{template.version + 1} draft · {savedText}
+              v{template.version}{" "}
+              {template.latestVersionIsPublished ? "published" : "draft"} ·{" "}
+              {savedText}
             </p>
           </div>
         </div>
@@ -53,6 +59,16 @@ export function BuilderHeader({
             onStepChange={onStepChange}
           />
           <div className="flex gap-3">
+            {template.latestVersionIsPublished && (
+              <Button
+                variant="secondary"
+                onClick={onCreateVersion}
+                disabled={saving}
+              >
+                {saving ? "Creating..." : "Create new version"}
+              </Button>
+            )}
+
             <Button
               variant="secondary"
               onClick={onSave}
@@ -64,7 +80,9 @@ export function BuilderHeader({
               <Button
                 icon={ArrowUp}
                 onClick={onPublish}
-                disabled={!canPublish}
+                disabled={
+                  !canPublish || saving || template.latestVersionIsPublished
+                }
                 title={
                   canPublish
                     ? undefined
@@ -72,7 +90,7 @@ export function BuilderHeader({
                 }
                 className="flex-1 sm:flex-none"
               >
-                Publish template
+                {saving ? "Publishing..." : "Publish template"}
               </Button>
             ) : (
               <Button onClick={onContinue} className="flex-1 sm:flex-none">

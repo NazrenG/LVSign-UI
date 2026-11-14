@@ -1,16 +1,30 @@
 import { Mail } from "lucide-react";
 import { VerticalSteps } from "@/components/shared";
 import { Card } from "@/components/ui";
-import { getRole, getStepLabel } from "../../../templateSelectors";
 
 export function RoutePreviewCard({ template }) {
-  const steps = template.roles.map((roleStep, index) => ({
-    key: roleStep.id,
-    title: getRole(roleStep).name,
-    subtitle: getStepLabel(index, template.roles.length),
-    caption: getRole(roleStep).source,
-    state: "pending",
-  }));
+  const steps = [...template.roles]
+    .sort((a, b) => a.routingOrder - b.routingOrder)
+    .map((role) => ({
+      key: role.id,
+      title: role.name,
+      subtitle: `Routing order ${role.routingOrder}`,
+      caption: getRecipientTypeLabel(role.recipientType),
+      state: "pending",
+    }));
+
+  function getRecipientTypeLabel(type) {
+    switch (Number(type)) {
+      case 2:
+        return "Approver";
+      case 3:
+        return "Viewer";
+      case 4:
+        return "Copy recipient";
+      default:
+        return "Signer";
+    }
+  }
 
   return (
     <Card className="p-5">

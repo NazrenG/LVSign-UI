@@ -22,8 +22,17 @@ export function useTemplateDraft(initialTemplate) {
       update: (patch) => dispatch({ type: DRAFT_ACTIONS.UPDATE, patch }),
       updateSection: (section, patch) =>
         dispatch({ type: DRAFT_ACTIONS.UPDATE_SECTION, section, patch }),
+      setRoles: (roles) =>
+        dispatch({
+          type: DRAFT_ACTIONS.SET_ROLES,
+          roles,
+        }),
 
-      addRole: () => dispatch({ type: DRAFT_ACTIONS.ADD_ROLE }),
+      addExistingRole: (role) =>
+        dispatch({
+          type: DRAFT_ACTIONS.ADD_EXISTING_ROLE,
+          role,
+        }),
       updateRole: (id, patch) =>
         dispatch({ type: DRAFT_ACTIONS.UPDATE_ROLE, id, patch }),
       removeRole: (id) => dispatch({ type: DRAFT_ACTIONS.REMOVE_ROLE, id }),
@@ -42,6 +51,16 @@ export function useTemplateDraft(initialTemplate) {
 
       markSaved: () =>
         dispatch({ type: DRAFT_ACTIONS.MARK_SAVED, at: new Date() }),
+      addDocument: (document) =>
+        dispatch({
+          type: DRAFT_ACTIONS.ADD_DOCUMENT,
+          document,
+        }),
+      addExistingField: (field) =>
+        dispatch({
+          type: DRAFT_ACTIONS.ADD_EXISTING_FIELD,
+          field,
+        }),
     }),
     [],
   );

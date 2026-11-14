@@ -59,12 +59,24 @@ const RECIPIENT_TYPE_TO_API = {
   viewer: 3,
   copy: 4,
 };
-const RECIPIENT_TYPES = {
-  1: "signer",
-  2: "approver",
-  3: "viewer",
-  4: "copy",
-};
+const RECIPIENT_TYPES = [
+  {
+    value: 1,
+    label: "Signer",
+  },
+  {
+    value: 2,
+    label: "Approver",
+  },
+  {
+    value: 3,
+    label: "Viewer",
+  },
+  {
+    value: 4,
+    label: "Copy recipient",
+  },
+];
 
 const RECIPIENT_STATUSES = {
   1: "created",
@@ -94,7 +106,6 @@ const FIELD_TYPES_MAP = {
   // UI-da Note ayrıca yoxdur.
   12: "text",
 };
-
 const FIELD_TYPE_TO_API = {
   signature: 1,
   dateSigned: 2,
@@ -107,6 +118,13 @@ const FIELD_TYPE_TO_API = {
   radio: 9,
   dropdown: 10,
   stamp: 11,
+};
+
+const FIELD_OWNER_TO_API = {
+  recipient: 1,
+  sender: 2,
+  directory: 3,
+  calculated: 4,
 };
 
 function fromRoutingRuleDto(rule) {
@@ -340,7 +358,7 @@ export const apiEnvelopeAdapter = {
 
       title: envelopeDto.subject ?? envelopeDto.title ?? "Untitled envelope",
 
-      status:mapEnvelopeStatus(envelopeDto.status),
+      status: mapEnvelopeStatus(envelopeDto.status),
 
       routingMode,
 
@@ -854,5 +872,48 @@ export const apiEnvelopeAdapter = {
     }
 
     return fromRoutingRuleDto(await response.json());
+  },
+
+  async createField(templateId, field) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/templates/${templateId}/fields`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          templateDocumentId: field.templateDocumentId,
+
+          recipientRoleId: field.recipientRoleId ?? null,
+
+          ownerType: field.ownerType,
+
+          fieldType: FIELD_TYPE_TO_API[field.type],
+
+          pageNumber: field.pageNumber,
+
+          x: field.x,
+          y: field.y,
+          width: field.width,
+          height: field.height,
+
+          isRequired: field.required,
+
+          label: field.label?.trim() || null,
+
+          options:
+            field.type === "dropdown" || field.type === "radio"
+              ? (field.options ?? [])
+              : null,
+        }),
+      },
+    );
+
+    await ensureSuccess(response, "Template field could not be created.");
+
+    return fromTemplateFieldDto(await response.json());
   },
 };

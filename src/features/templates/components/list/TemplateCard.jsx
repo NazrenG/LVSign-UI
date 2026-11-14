@@ -1,16 +1,15 @@
-import { PenLine, Send } from "lucide-react";
+import { FileText, PenLine, Send } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RoleChain } from "@/components/shared";
 import { Button, Card } from "@/components/ui";
 import { ROUTES } from "@/constants/routes";
 import { formatDayMonthYear } from "@/utils/formatters";
-import { getRoleChainItems } from "../../templateSelectors";
 import { CategoryLabel } from "./CategoryLabel";
 
 function CardStat({ label, value, mono = false }) {
   return (
     <div>
       <dt className="text-[13px] text-ink-muted">{label}</dt>
+
       <dd
         className={
           mono
@@ -24,14 +23,34 @@ function CardStat({ label, value, mono = false }) {
   );
 }
 
+function formatStatus(status) {
+  if (!status) {
+    return "Draft";
+  }
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 export function TemplateCard({ template }) {
-  const { stats } = template;
+  const canEdit =
+    template.isOwner ||
+    ["edit", "manage"].includes(template.effectiveAccessLevel);
 
   return (
     <Card as="article" className="flex flex-col p-5">
       <div className="flex items-center justify-between gap-3">
-        <CategoryLabel category={template.category} />
-        <RoleChain items={getRoleChainItems(template)} connectorTone="light" />
+        {template.category ? (
+          <CategoryLabel category={template.category} />
+        ) : (
+          <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
+            <FileText className="size-4" strokeWidth={1.5} />
+            Template
+          </span>
+        )}
+
+        <span className="rounded-full bg-canvas-muted px-2.5 py-1 text-xs font-medium text-ink-muted">
+          {formatStatus(template.status)}
+        </span>
       </div>
 
       <h3 className="mt-4 font-serif text-xl text-ink">
@@ -42,33 +61,43 @@ export function TemplateCard({ template }) {
           {template.name}
         </Link>
       </h3>
-      <p className="mt-2 mb-5 text-[15px] text-ink-muted">
-        {template.description}
+
+      <p className="mt-2 mb-5 line-clamp-3 text-[15px] text-ink-muted">
+        {template.description || "No description provided."}
       </p>
 
       <dl className="mt-auto grid grid-cols-3 gap-3 border-y border-line py-4">
+        <CardStat label="Version" value={`v${template.latestVersionNumber}`} />
+
         <CardStat
-          label="Avg. completion"
-          value={`${stats.avgCompletionDays} days`}
+          label="Access"
+          value={template.isOwner ? "Owner" : template.effectiveAccessLevel}
         />
-        <CardStat label="Times used" value={stats.timesUsed} />
+
         <CardStat
           label="Updated"
-          value={formatDayMonthYear(template.updatedAt)}
+          value={
+            template.updatedAt ? formatDayMonthYear(template.updatedAt) : "—"
+          }
           mono
         />
       </dl>
 
       <div className="mt-4 flex items-center justify-between gap-3">
-        <Button
-          as={Link}
-          to={ROUTES.templateBuilder(template.id)}
-          variant="ghost"
-          icon={PenLine}
-          className="-ml-3"
-        >
-          Edit template
-        </Button>
+        {canEdit ? (
+          <Button
+            as={Link}
+            to={ROUTES.templateBuilder(template.id)}
+            variant="ghost"
+            icon={PenLine}
+            className="-ml-3"
+          >
+            Edit template
+          </Button>
+        ) : (
+          <div />
+        )}
+
         <Button
           as={Link}
           to={ROUTES.templateDetail(template.id)}

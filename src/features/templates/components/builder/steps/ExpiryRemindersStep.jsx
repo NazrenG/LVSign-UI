@@ -1,36 +1,48 @@
+import { Card, CardHeader, Input } from "@/components/ui";
 import { BuilderStepLayout } from "../BuilderStepLayout";
-import { ExpirationCard } from "../expiry/ExpirationCard";
-import { PublishChecklistCard } from "../expiry/PublishChecklistCard";
-import { ReminderEmailPreview } from "../expiry/ReminderEmailPreview";
-import { RemindersCard } from "../expiry/RemindersCard";
-import { SignerTimelineCard } from "../expiry/SignerTimelineCard";
 
-export function ExpiryRemindersStep({
-  template,
-  actions,
-  checks,
-  onStepChange,
-}) {
-  const updateExpiry = (patch) => actions.updateSection("expiry", patch);
-
+export function ExpiryRemindersStep({ template, actions }) {
   return (
     <BuilderStepLayout
       title="Expiry & reminders"
-      description="Set how long a document stays valid and how LV Sign chases people who have not signed yet."
-      aside={
-        <>
-          <PublishChecklistCard
-            checks={checks}
-            version={template.version}
-            onStepChange={onStepChange}
-          />
-          <ReminderEmailPreview template={template} />
-        </>
-      }
+      description="Configure the default expiry and signing reminder interval for envelopes created from this template."
     >
-      <ExpirationCard expiry={template.expiry} onChange={updateExpiry} />
-      <RemindersCard expiry={template.expiry} onChange={updateExpiry} />
-      <SignerTimelineCard expiry={template.expiry} />
+      <Card className="space-y-5 p-5 sm:p-6">
+        <CardHeader
+          title="Envelope timing"
+          description="These values become defaults when an envelope is created from this template."
+        />
+
+        <Input
+          label="Envelope expires after"
+          type="number"
+          min={1}
+          value={template.expirationDays ?? ""}
+          suffix="days after sending"
+          onChange={(event) => {
+            const value = Number(event.target.value);
+
+            actions.update({
+              expirationDays: value > 0 ? value : null,
+            });
+          }}
+        />
+
+        <Input
+          label="Signing reminder interval"
+          type="number"
+          min={1}
+          value={template.reminderIntervalDays ?? ""}
+          suffix="days"
+          onChange={(event) => {
+            const value = Number(event.target.value);
+
+            actions.update({
+              reminderIntervalDays: value > 0 ? value : null,
+            });
+          }}
+        />
+      </Card>
     </BuilderStepLayout>
   );
 }
