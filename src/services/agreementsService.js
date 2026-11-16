@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
-
+import { authenticatedFetch } from "@/features/auth/authenticatedFetch";
 export async function getAgreements() {
-  const response = await fetch(`${API_BASE_URL}/api/envelopes`);
+  const response = await authenticatedFetch(`${API_BASE_URL}/api/envelopes`);
 
   if (!response.ok) {
     throw new Error("Agreements could not be loaded.");
@@ -24,7 +24,7 @@ export async function getAgreements() {
 }
 
 export async function getAgreementDownloads(envelopeId) {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `${API_BASE_URL}/api/envelopes/${envelopeId}/downloads`,
   );
 
@@ -38,7 +38,7 @@ export async function getAgreementDownloads(envelopeId) {
 }
 
 async function downloadFile(url, fallbackFileName) {
-  const response = await fetch(url);
+  const response = await authenticatedFetch(url);
 
   if (!response.ok) {
     const message = await response.text();
@@ -87,7 +87,7 @@ export async function voidEnvelope(
   envelopeId,
   reason,
 ) {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `${API_BASE_URL}/api/envelopes/${envelopeId}/void`,
     {
       method: "POST",
@@ -115,7 +115,7 @@ export async function voidEnvelope(
 export async function deleteDraftEnvelope(
   envelopeId,
 ) {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `${API_BASE_URL}/api/envelopes/${envelopeId}`,
     {
       method: "DELETE",
@@ -136,7 +136,7 @@ export async function deleteDraftEnvelope(
 export async function getAgreementHistory(
   envelopeId,
 ) {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `${API_BASE_URL}/api/envelopes/${envelopeId}/history`,
   );
 

@@ -50,7 +50,7 @@ export function MicrosoftSignInPanel({
             <span>
               {isLoading
                 ? "Complete sign-in in the Microsoft window to continue."
-                : "Use your company Microsoft account to access LV.SignFlow."}
+                : "Use your company Microsoft account to access LV Sign."}
             </span>
           </p>
         )}

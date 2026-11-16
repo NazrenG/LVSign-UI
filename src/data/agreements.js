@@ -54,7 +54,7 @@ export const AGREEMENTS = [
       { personId: "nk", state: CURRENT, date: "2026-09-23T08:51" },
     ],
     history: [
-      { at: "2026-09-23T08:51", action: "Signed by Farid Aliyev" },
+      { at: "2026-09-23T08:51", action: "Signed by Nazrin Guliyeva" },
       { at: "2026-09-22T14:06", action: "Signed by Aysel Mammadova" },
     ],
   },
@@ -115,7 +115,9 @@ export const AGREEMENTS = [
       { personId: "ti", state: SIGNED, date: "2026-09-17T11:00" },
       { personId: "fa", state: SIGNER_DECLINED, date: "2026-09-19T15:48" },
     ],
-    history: [{ at: "2026-09-19T15:48", action: "Declined by Farid Aliyev" }],
+    history: [
+      { at: "2026-09-19T15:48", action: "Declined by Nazrin Guliyeva" },
+    ],
   },
   {
     id: "fire-safety-q3",

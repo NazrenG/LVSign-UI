@@ -42,7 +42,7 @@ export function getSignerCaption(signer, { isCurrentUser = false } = {}) {
   }
 }
 
-/** "Waiting for Farid Aliyev and 1 other" */
+/** "Waiting for Nazrin Guliyeva and 1 other" */
 export function getWaitingSummary(agreement) {
   const current = getCurrentSigner(agreement);
   if (!current) return "";

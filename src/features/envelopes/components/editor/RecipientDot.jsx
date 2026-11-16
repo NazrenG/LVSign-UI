@@ -15,6 +15,6 @@ export function RecipientDot({ colors = UNASSIGNED_COLORS, className }) {
   );
 }
 
-/** "Farid Aliyev", or a readable placeholder while the name is still empty. */
+/** "Nazrin Guliyeva", or a readable placeholder while the name is still empty. */
 export const recipientName = (recipient) =>
   recipient?.displayName.trim() || "Unnamed recipient";

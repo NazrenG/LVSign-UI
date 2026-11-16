@@ -9,7 +9,7 @@ import {
 } from "./templateMapper";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
-
+import { authenticatedFetch } from "@/features/auth/authenticatedFetch";
 /* =========================================================
    ENUM → API MAPPINGS
    ========================================================= */
@@ -116,7 +116,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async listAll() {
-    const response = await fetch(`${API_BASE_URL}/api/templates`);
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/templates`);
 
     await ensureSuccess(response, "Templates could not be loaded.");
 
@@ -126,7 +126,7 @@ export const apiTemplateAdapter = {
   },
 
   async listMine() {
-    const response = await fetch(`${API_BASE_URL}/api/templates/my`);
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/templates/my`);
 
     await ensureSuccess(response, "Your templates could not be loaded.");
 
@@ -136,7 +136,7 @@ export const apiTemplateAdapter = {
   },
 
   async listSharedWithMe() {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/shared-with-me`,
     );
 
@@ -152,7 +152,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async getById(templateId) {
-    const response = await fetch(`${API_BASE_URL}/api/templates/${templateId}`);
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/templates/${templateId}`);
 
     if (response.status === 404) {
       return null;
@@ -168,7 +168,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async create(template) {
-    const response = await fetch(`${API_BASE_URL}/api/templates`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/templates`, {
       method: "POST",
 
       headers: {
@@ -192,7 +192,7 @@ export const apiTemplateAdapter = {
   },
 
   async update(templateId, template) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}`,
       {
         method: "PUT",
@@ -211,7 +211,7 @@ export const apiTemplateAdapter = {
   },
 
   async delete(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}`,
       {
         method: "DELETE",
@@ -226,7 +226,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async publish(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/publish`,
       {
         method: "POST",
@@ -239,7 +239,7 @@ export const apiTemplateAdapter = {
   },
 
   async createNewVersion(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/versions`,
       {
         method: "POST",
@@ -259,7 +259,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async getRecipientRoles(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/recipient-roles`,
     );
 
@@ -276,7 +276,7 @@ export const apiTemplateAdapter = {
   },
 
   async createRecipientRole(templateId, role) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/recipient-roles`,
       {
         method: "POST",
@@ -312,7 +312,7 @@ export const apiTemplateAdapter = {
   },
 
   async updateRecipientRole(templateId, roleId, role) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/recipient-roles/${roleId}`,
       {
         method: "PUT",
@@ -348,7 +348,7 @@ export const apiTemplateAdapter = {
   },
 
   async deleteRecipientRole(templateId, roleId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/recipient-roles/${roleId}`,
       {
         method: "DELETE",
@@ -359,7 +359,7 @@ export const apiTemplateAdapter = {
   },
 
   async reorderRecipientRoles(templateId, roleIds) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/recipient-roles/order`,
       {
         method: "PUT",
@@ -382,7 +382,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async getDocuments(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/documents`,
     );
 
@@ -398,7 +398,7 @@ export const apiTemplateAdapter = {
 
     formData.append("file", file);
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/documents`,
       {
         method: "POST",
@@ -412,7 +412,7 @@ export const apiTemplateAdapter = {
   },
 
   async deleteDocument(templateId, documentId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/documents/${documentId}`,
       {
         method: "DELETE",
@@ -423,7 +423,7 @@ export const apiTemplateAdapter = {
   },
 
   async getDocumentContent(templateId, documentId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/documents/${documentId}/content`,
     );
 
@@ -437,7 +437,7 @@ export const apiTemplateAdapter = {
      ======================= */
 
   async getFields(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/fields`,
     );
 
@@ -449,7 +449,7 @@ export const apiTemplateAdapter = {
   },
 
   async createField(templateId, field) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/fields`,
       {
         method: "POST",
@@ -468,7 +468,7 @@ export const apiTemplateAdapter = {
   },
 
   async updateField(templateId, fieldId, field) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/fields/${fieldId}`,
       {
         method: "PUT",
@@ -487,7 +487,7 @@ export const apiTemplateAdapter = {
   },
 
   async deleteField(templateId, fieldId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/fields/${fieldId}`,
       {
         method: "DELETE",
@@ -552,7 +552,7 @@ export const apiTemplateAdapter = {
   // ============================
 
   async getRoutingRuleSets(templateId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets`,
     );
 
@@ -561,7 +561,7 @@ export const apiTemplateAdapter = {
     return response.json();
   },
   async createRoutingRuleSet(templateId, ruleSet) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets`,
       {
         method: "POST",
@@ -581,7 +581,7 @@ export const apiTemplateAdapter = {
   },
 
   async getRoutingRules(templateId, ruleSetId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules`,
     );
 
@@ -591,7 +591,7 @@ export const apiTemplateAdapter = {
   },
 
   async getRoutingConditions(templateId, ruleSetId, ruleId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules/${ruleId}/conditions`,
     );
 
@@ -601,7 +601,7 @@ export const apiTemplateAdapter = {
   },
 
   async createRoutingRule(templateId, ruleSetId, rule) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules`,
       {
         method: "POST",
@@ -624,7 +624,7 @@ export const apiTemplateAdapter = {
   },
 
   async createRoutingCondition(templateId, ruleSetId, ruleId, condition) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules/${ruleId}/conditions`,
       {
         method: "POST",
@@ -645,7 +645,7 @@ export const apiTemplateAdapter = {
   },
 
   async createRoutingAction(templateId, ruleSetId, ruleId, action) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules/${ruleId}/actions`,
       {
         method: "POST",
@@ -666,7 +666,7 @@ export const apiTemplateAdapter = {
   },
 
   async getRoutingActions(templateId, ruleSetId, ruleId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules/${ruleId}/actions`,
     );
 
@@ -682,7 +682,7 @@ export const apiTemplateAdapter = {
     conditionId,
     condition,
   ) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules/${ruleId}/conditions/${conditionId}`,
       {
         method: "PUT",
@@ -700,7 +700,7 @@ export const apiTemplateAdapter = {
   },
 
   async updateRoutingAction(templateId, ruleSetId, ruleId, actionId, action) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}/rules/${ruleId}/actions/${actionId}`,
       {
         method: "PUT",
@@ -718,7 +718,7 @@ export const apiTemplateAdapter = {
   },
 
   async deleteRoutingRuleSet(templateId, ruleSetId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/templates/${templateId}/routing-rule-sets/${ruleSetId}`,
       {
         method: "DELETE",

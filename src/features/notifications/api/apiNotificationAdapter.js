@@ -1,4 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+import { authenticatedFetch } from "@/features/auth/authenticatedFetch";
 
 async function ensureSuccess(response, fallbackMessage) {
   if (response.ok) {
@@ -12,7 +13,7 @@ async function ensureSuccess(response, fallbackMessage) {
 
 export const apiNotificationAdapter = {
   async getNotifications(userId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/notifications/user/${userId}`,
     );
 
@@ -22,7 +23,7 @@ export const apiNotificationAdapter = {
   },
 
   async getUnreadCount(userId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/notifications/user/${userId}/unread-count`,
     );
 
@@ -35,7 +36,7 @@ export const apiNotificationAdapter = {
   },
 
   async markAsRead(notificationId, userId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/notifications/${notificationId}/read?userId=${userId}`,
       {
         method: "PATCH",
@@ -46,7 +47,7 @@ export const apiNotificationAdapter = {
   },
 
   async markAllAsRead(userId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/notifications/user/${userId}/read-all`,
       {
         method: "PATCH",
@@ -57,7 +58,7 @@ export const apiNotificationAdapter = {
   },
 
   async getPreferences(userId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/notifications/user/${userId}/preferences`,
     );
 
@@ -70,7 +71,7 @@ export const apiNotificationAdapter = {
   },
 
   async updatePreferences(userId, preferences) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/notifications/user/${userId}/preferences`,
       {
         method: "PUT",

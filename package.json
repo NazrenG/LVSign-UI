@@ -10,6 +10,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@azure/msal-browser": "^5.29.1",
+    "@azure/msal-react": "^5.8.2",
     "lucide-react": "^1.48.0",
     "pdfjs-dist": "^6.4.299",
     "react": "^19.3.0",
