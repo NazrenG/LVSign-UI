@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LV Sign Authentication</title>
+  </head>
+  <body>
+    <p>Processing authentication...</p>
+
+    <script type="module">
+      import { broadcastResponseToMainFrame } from "@azure/msal-browser/redirect-bridge";
+
+      broadcastResponseToMainFrame().catch((error) => {
+        console.error("MSAL redirect bridge error:", error);
+      });
+    </script>
+  </body>
+</html>

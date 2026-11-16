@@ -11,20 +11,23 @@ import {
 import { readPdfPages } from "@/components/shared";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
-
+import { authenticatedFetch } from "@/features/auth/authenticatedFetch";
 
 async function createSignatureAsset(field, mark) {
   const body = toCreateSignatureRequest(field.fieldType, mark);
 
-  const response = await fetch(`${API_BASE_URL}/api/signing/signatures`, {
-    method: "POST",
+  const response = await authenticatedFetch(
+    `${API_BASE_URL}/api/signing/signatures`,
+    {
+      method: "POST",
 
-    headers: {
-      "Content-Type": "application/json",
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify(body),
     },
-
-    body: JSON.stringify(body),
-  });
+  );
 
   if (response.status === 401 || response.status === 403) {
     throw new SigningAccessDeniedError();
@@ -41,7 +44,9 @@ async function createSignatureAsset(field, mark) {
 export const apiSigningAdapter = {
   async getSession(envelopeId) {
     console.log("API SIGNING: session request");
-    const response = await fetch(`${API_BASE_URL}/api/signing/${envelopeId}`);
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/api/signing/${envelopeId}`,
+    );
     console.log("API SIGNING: session redponse", response.status);
     if (response.status === 404) {
       throw new SigningSessionNotFoundError(envelopeId);
@@ -71,7 +76,7 @@ export const apiSigningAdapter = {
 
     const documents = await Promise.all(
       session.documents.map(async (document) => {
-        const documentResponse = await fetch(
+        const documentResponse = await authenticatedFetch(
           `${API_BASE_URL}/api/envelopes/${session.envelopeId}/documents/${document.id}/content`,
         );
 
@@ -89,7 +94,7 @@ export const apiSigningAdapter = {
         const pages = await readPdfPages(fileUrl);
 
         console.log("PDF: loading completed", document.id, pages);
-        
+
         return {
           ...document,
           fileUrl,
@@ -111,7 +116,7 @@ export const apiSigningAdapter = {
       return null;
     }
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/signing/${envelopeId}/fields/${field.id}/value`,
       {
         method: "PUT",
@@ -166,7 +171,7 @@ export const apiSigningAdapter = {
 
     const body = toApplyMarkRequest(field.fieldType, persistedMark);
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/signing/${envelopeId}/fields/${field.id}/mark`,
       {
         method: "PUT",
@@ -208,7 +213,7 @@ export const apiSigningAdapter = {
     };
   },
   async removeMark(envelopeId, fieldId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/signing/${envelopeId}/fields/${fieldId}/mark`,
       {
         method: "DELETE",
@@ -226,7 +231,7 @@ export const apiSigningAdapter = {
     }
   },
   async completeSigning(session) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/signing/${session.envelopeId}/finish`,
       {
         method: "POST",
@@ -247,7 +252,7 @@ export const apiSigningAdapter = {
   },
 
   async declineSigning(session, reason) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/signing/${session.envelopeId}/decline`,
       {
         method: "POST",

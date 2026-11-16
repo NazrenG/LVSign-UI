@@ -2,15 +2,14 @@
 export const PEOPLE = {
   nk: {
     id: "nk",
-    apiUserId:
-    "40000000-0000-0000-0000-000000000001",
+    apiUserId: "40000000-0000-0000-0000-000000000001",
     name: "Nazrin Guliyeva",
     department: "System Developer",
     title: "System Developer",
   },
   fa: {
     id: "fa",
-    name: "Farid Aliyev",
+    name: "Nazrin Guliyeva",
     department: "Operations",
     title: "Operations manager",
   },

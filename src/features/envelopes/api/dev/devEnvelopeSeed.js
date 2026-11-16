@@ -90,7 +90,7 @@ export const buildSeedEnvelopes = (sender) => ({
     recipients: [
       recipient(
         FARID_ID,
-        "Farid Aliyev",
+        "Nazrin Guliyeva",
         "farid.aliyev@lvlogistics.az",
         "Operations manager",
         "signer",

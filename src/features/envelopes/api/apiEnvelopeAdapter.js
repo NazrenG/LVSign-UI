@@ -5,6 +5,7 @@ import { InvalidDocumentError } from "./envelopeErrors";
 import { FIELD_TYPES } from "../models/fieldTypes";
 import { fromEnvelopeDto } from "../mappers/envelopeMapper";
 import { EnvelopeNotFoundError } from "./envelopeErrors";
+import { authenticatedFetch } from "@/features/auth/authenticatedFetch";
 
 function createEmptyEnvelope(id, title) {
   return {
@@ -171,7 +172,7 @@ function enumValue(value, map, fallback) {
 
 export const apiEnvelopeAdapter = {
   async createEnvelope({ title = "Untitled envelope" } = {}) {
-    const response = await fetch(`${API_BASE_URL}/api/envelopes`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/envelopes`, {
       method: "POST",
 
       headers: {
@@ -210,14 +211,14 @@ export const apiEnvelopeAdapter = {
       fieldsResponse,
       routingRulesResponse,
     ] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/envelopes/${envelopeId}`),
+      authenticatedFetch(`${API_BASE_URL}/api/envelopes/${envelopeId}`),
 
-      fetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/documents`),
+      authenticatedFetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/documents`),
 
-      fetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/recipients`),
+      authenticatedFetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/recipients`),
 
-      fetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/fields`),
-      fetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/routing-rules`),
+      authenticatedFetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/fields`),
+      authenticatedFetch(`${API_BASE_URL}/api/envelopes/${envelopeId}/routing-rules`),
     ]);
 
     if (envelopeResponse.status === 404) {
@@ -247,7 +248,7 @@ export const apiEnvelopeAdapter = {
 
     const documents = await Promise.all(
       documentDtos.map(async (document) => {
-        const response = await fetch(
+        const response = await authenticatedFetch(
           `${API_BASE_URL}/api/envelopes/${envelopeId}/documents/${document.id}/content`,
         );
 
@@ -420,7 +421,7 @@ export const apiEnvelopeAdapter = {
 
     formData.append("file", file);
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/documents`,
       {
         method: "POST",
@@ -462,7 +463,7 @@ export const apiEnvelopeAdapter = {
       expiresAt = date.toISOString();
     }
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelope.id}`,
       {
         method: "PUT",
@@ -497,7 +498,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async sendEnvelope(envelopeId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/send`,
       {
         method: "POST",
@@ -516,7 +517,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async deleteDocument(envelopeId, documentId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/documents/${documentId}`,
       {
         method: "DELETE",
@@ -531,7 +532,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async listUsers() {
-    const response = await fetch(`${API_BASE_URL}/api/users`);
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/users`);
 
     if (!response.ok) {
       throw new Error("Users could not be loaded.");
@@ -541,7 +542,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async createRecipient(envelopeId, recipient) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/recipients`,
       {
         method: "POST",
@@ -583,7 +584,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async updateRecipient(envelopeId, recipientId, recipient) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/recipients/${recipientId}`,
       {
         method: "PUT",
@@ -623,7 +624,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async deleteRecipient(envelopeId, recipientId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/recipients/${recipientId}`,
       {
         method: "DELETE",
@@ -649,7 +650,7 @@ export const apiEnvelopeAdapter = {
       throw new Error("Field recipient is required.");
     }
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/fields`,
       {
         method: "POST",
@@ -697,7 +698,7 @@ export const apiEnvelopeAdapter = {
     return response.json();
   },
   async deleteField(envelopeId, fieldId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/fields/${fieldId}`,
       {
         method: "DELETE",
@@ -711,7 +712,7 @@ export const apiEnvelopeAdapter = {
     }
   },
   async updateField(envelopeId, fieldId, field) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/fields/${fieldId}`,
       {
         method: "PUT",
@@ -757,7 +758,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async reorderDocuments(envelopeId, documentIds) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/documents/order`,
       {
         method: "PUT",
@@ -780,7 +781,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async createRoutingRule(envelopeId, rule) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/routing-rules`,
       {
         method: "POST",
@@ -821,7 +822,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async deleteRoutingRule(envelopeId, ruleId) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/routing-rules/${ruleId}`,
       {
         method: "DELETE",
@@ -836,7 +837,7 @@ export const apiEnvelopeAdapter = {
   },
 
   async updateRoutingRule(envelopeId, ruleId, rule) {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `${API_BASE_URL}/api/envelopes/${envelopeId}/routing-rules/${ruleId}`,
       {
         method: "PUT",
@@ -874,46 +875,46 @@ export const apiEnvelopeAdapter = {
     return fromRoutingRuleDto(await response.json());
   },
 
-  async createField(templateId, field) {
-    const response = await fetch(
-      `${API_BASE_URL}/api/templates/${templateId}/fields`,
-      {
-        method: "POST",
+  // async createField(templateId, field) {
+  //   const response = await authenticatedFetch(
+  //     `${API_BASE_URL}/api/templates/${templateId}/fields`,
+  //     {
+  //       method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
 
-        body: JSON.stringify({
-          templateDocumentId: field.templateDocumentId,
+  //       body: JSON.stringify({
+  //         templateDocumentId: field.templateDocumentId,
 
-          recipientRoleId: field.recipientRoleId ?? null,
+  //         recipientRoleId: field.recipientRoleId ?? null,
 
-          ownerType: field.ownerType,
+  //         ownerType: field.ownerType,
 
-          fieldType: FIELD_TYPE_TO_API[field.type],
+  //         fieldType: FIELD_TYPE_TO_API[field.type],
 
-          pageNumber: field.pageNumber,
+  //         pageNumber: field.pageNumber,
 
-          x: field.x,
-          y: field.y,
-          width: field.width,
-          height: field.height,
+  //         x: field.x,
+  //         y: field.y,
+  //         width: field.width,
+  //         height: field.height,
 
-          isRequired: field.required,
+  //         isRequired: field.required,
 
-          label: field.label?.trim() || null,
+  //         label: field.label?.trim() || null,
 
-          options:
-            field.type === "dropdown" || field.type === "radio"
-              ? (field.options ?? [])
-              : null,
-        }),
-      },
-    );
+  //         options:
+  //           field.type === "dropdown" || field.type === "radio"
+  //             ? (field.options ?? [])
+  //             : null,
+  //       }),
+  //     },
+  //   );
 
-    await ensureSuccess(response, "Template field could not be created.");
+  //   await ensureSuccess(response, "Template field could not be created.");
 
-    return fromTemplateFieldDto(await response.json());
-  },
+  //   return fromTemplateFieldDto(await response.json());
+  // },
 };

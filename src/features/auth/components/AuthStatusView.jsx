@@ -7,7 +7,7 @@ const VIEWS = {
   [AUTH_STATUS.accessDenied]: {
     icon: LockKeyhole,
     tone: "bg-canvas-muted text-ink",
-    title: "Access to LV.SignFlow is restricted",
+    title: "Access to LV Sign is restricted",
     message:
       "Your Microsoft account was verified, but you do not currently have access to this application.",
     hint: "If you need access, contact IT Support and mention the account you signed in with.",
@@ -16,14 +16,14 @@ const VIEWS = {
     icon: Clock3,
     tone: "bg-warning-soft text-warning",
     title: "Your session has expired",
-    message: "Please sign in again to continue using LV.SignFlow.",
+    message: "Please sign in again to continue using LV Sign.",
   },
   [AUTH_STATUS.error]: {
     icon: WifiOff,
     tone: "bg-danger-soft text-danger",
     title: "We couldn't complete sign-in",
     message:
-      "LV.SignFlow couldn't be reached or something unexpected happened. Check your connection and try again.",
+      "LV Sign couldn't be reached or something unexpected happened. Check your connection and try again.",
     hint: "If the problem continues, contact your IT administrator.",
   },
 };

@@ -81,7 +81,7 @@ export function getGreeting(date = new Date()) {
   return "Good evening";
 }
 
-/** "Farid Aliyev" -> "Farid" */
+/** "Nazrin Guliyeva" -> "Farid" */
 export const getFirstName = (fullName) => fullName.split(" ")[0];
 
 /** "Nazrin Guliyeva" -> "NG" */

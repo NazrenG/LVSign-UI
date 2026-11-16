@@ -1,6 +1,6 @@
 export const ROUTES = {
   login: "/login",
-  /** Signed in with Microsoft, but not authorized for LV.SignFlow. */
+  /** Signed in with Microsoft, but not authorized for LV Sign. */
   accessDenied: "/access-denied",
   sessionExpired: "/session-expired",
   home: "/",
@@ -16,7 +16,7 @@ export const ROUTES = {
   adminPermissionProfiles: "/admin/permission-profiles",
   adminStamps: "/admin/stamps",
   adminAgreementRules: "/admin/agreement-rules",
-  notifications:"/settings/notifications",
+  notifications: "/settings/notifications",
   /**
    * Prepare Document editor for an envelope. Use "new" to start a draft;
    * add ?document=<documentId> to open a specific document.

@@ -45,7 +45,7 @@ export function SignedDocumentPreview() {
             />
           </svg>
           <div className="border-t border-line-strong pt-2 font-mono text-[11px] text-ink-muted">
-            Farid Aliyev · 22 Sep 2026, 16:05 · LVS-2026-0919-A2D0
+            Nazrin Guliyeva · 22 Sep 2026, 16:05 · LVS-2026-0919-A2D0
           </div>
         </div>
       </div>

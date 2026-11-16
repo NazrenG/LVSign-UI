@@ -7,7 +7,7 @@ export const AUTH_STATUS = Object.freeze({
   unauthenticated: "unauthenticated",
   authenticating: "authenticating",
   authenticated: "authenticated",
-  /** Microsoft sign-in succeeded, but LV.SignFlow did not authorize the user. */
+  /** Microsoft sign-in succeeded, but LV Sign did not authorize the user. */
   accessDenied: "accessDenied",
   sessionExpired: "sessionExpired",
   /** Connectivity or unexpected authentication problem. */
