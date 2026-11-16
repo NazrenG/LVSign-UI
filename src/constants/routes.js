@@ -11,6 +11,11 @@ export const ROUTES = {
   templateBuilder: (id = ":templateId") => `/templates/${id}/edit`,
   insights: "/insights",
   admin: "/admin",
+  adminUsers: "/admin/users",
+  adminDepartments: "/admin/departments",
+  adminPermissionProfiles: "/admin/permission-profiles",
+  adminStamps: "/admin/stamps",
+  adminAgreementRules: "/admin/agreement-rules",
   notifications:"/settings/notifications",
   /**
    * Prepare Document editor for an envelope. Use "new" to start a draft;

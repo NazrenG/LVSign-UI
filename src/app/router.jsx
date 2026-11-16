@@ -15,6 +15,11 @@ import { TemplateDetailPage } from "@/pages/TemplateDetailPage";
 import { TemplatesPage } from "@/pages/TemplatesPage";
 import { NotificationSettingsPage } from "@/pages/NotificationSettingsPage";
 
+/** Lazy route loader for one export of the Admin pages module. */
+const adminRoute = (name) => async () => ({
+  Component: (await import("@/pages/AdminPages"))[name],
+});
+
 export const router = createBrowserRouter([
   { path: ROUTES.login, element: <LoginPage /> },
   { path: ROUTES.accessDenied, element: <AccessDeniedPage /> },
@@ -28,7 +33,29 @@ export const router = createBrowserRouter([
       { path: ROUTES.templates, element: <TemplatesPage /> },
       { path: ROUTES.templateDetail(), element: <TemplateDetailPage /> },
       { path: ROUTES.insights, element: <PlaceholderPage title="Insights" /> },
-      { path: ROUTES.admin, element: <PlaceholderPage title="Admin" /> },
+      {
+        // Admin workspace (UI prototype with demo data, no backend calls).
+        // Lazy so the admin screens load only when someone opens Admin.
+        path: ROUTES.admin,
+        lazy: adminRoute("AdminLayout"),
+        children: [
+          { index: true, lazy: adminRoute("AdminOverviewPage") },
+          { path: ROUTES.adminUsers, lazy: adminRoute("AdminUsersPage") },
+          {
+            path: ROUTES.adminDepartments,
+            lazy: adminRoute("AdminDepartmentsPage"),
+          },
+          {
+            path: ROUTES.adminPermissionProfiles,
+            lazy: adminRoute("AdminPermissionProfilesPage"),
+          },
+          { path: ROUTES.adminStamps, lazy: adminRoute("AdminStampsPage") },
+          {
+            path: ROUTES.adminAgreementRules,
+            lazy: adminRoute("AdminAgreementRulesPage"),
+          },
+        ],
+      },
     ],
   },
   // Full-screen flows (own header, no sidebar)
