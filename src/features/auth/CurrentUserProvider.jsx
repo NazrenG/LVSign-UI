@@ -9,7 +9,9 @@ export function CurrentUserProvider({ children }) {
   const { instance, accounts, inProgress } = useMsal();
 
   const account = instance.getActiveAccount() ?? accounts[0] ?? null;
-  const accountId = account?.homeAccountId ?? null;
+  const accountId = account
+    ? `${account.homeAccountId}:${account.localAccountId ?? ""}`
+    : null;
 
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ export function CurrentUserProvider({ children }) {
 
           throw error;
         }
-        
+
         const user = await response.json();
 
         if (!cancelled) {

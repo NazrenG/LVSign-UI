@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ALL_PROTOTYPE_PERMISSION_KEYS } from "../adminConstants";
 import { demoId } from "../adminSelectors";
@@ -9,6 +9,20 @@ import {
   DEMO_STAMPS,
   DEMO_USERS,
 } from "../data/adminDemoData";
+import { adminUsersApi } from "../api/adminUsersApi";
+import { mapAdminUsers } from "../api/adminUserMapper";
+import { useCurrentUser } from "@/features/auth/CurrentUserProvider";
+import {
+  toCreateAdminUserRequest,
+  toUpdateAdminUserRequest,
+} from "../api/adminUserRequests";
+
+import { adminDepartmentsApi } from "../api/adminDepartmentsApi";
+import {
+  mapAdminDepartment,
+  mapAdminDepartments,
+  toDepartmentRequest,
+} from "../api/adminDepartmentMapper";
 
 const initialProfiles = () =>
   DEMO_PROFILES.map((profile) => ({
@@ -35,56 +49,216 @@ const releaseImage = (url) => {
  * No requests are sent anywhere.
  */
 export function useAdminWorkspace() {
-  const [users, setUsers] = useState(DEMO_USERS);
-  const [departments, setDepartments] = useState(DEMO_DEPARTMENTS);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [usersError, setUsersError] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [departmentsLoading, setDepartmentsLoading] = useState(true);
+  const [departmentsError, setDepartmentsError] = useState(null);
   const [profiles, setProfiles] = useState(initialProfiles);
   const [stamps, setStamps] = useState(DEMO_STAMPS);
   const [agreementRules, setAgreementRules] = useState(DEFAULT_AGREEMENT_RULES);
+  const [accessProfiles, setAccessProfiles] = useState([]);
+  const [accessRoles, setAccessRoles] = useState([]);
 
-  const addUser = useCallback((values) => {
-    setUsers((current) => [
-      {
-        id: demoId("u"),
-        ...values,
-        email: values.email.trim().toLowerCase(),
-        identity: "notLinked",
-        addedAt: today(),
-      },
-      ...current,
-    ]);
-    notifyDemo(`${values.name} added to the demo user list.`);
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all([
+      adminUsersApi.getPermissionProfiles(),
+      adminUsersApi.getRoles(),
+    ])
+      .then(([profiles, roles]) => {
+        if (cancelled) return;
+        setAccessProfiles(profiles);
+        setAccessRoles(roles);
+      })
+      .catch((error) => {
+        console.error("Access options failed:", error);
+        toast.error("Unable to load roles or profiles.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const updateUser = useCallback((id, values) => {
-    setUsers((current) =>
-      current.map((user) => (user.id === id ? { ...user, ...values } : user)),
-    );
-    notifyDemo("User updated in the demo.");
-  }, []);
+  const loadDepartments = useCallback(async () => {
+    setDepartmentsLoading(true);
+    setDepartmentsError(null);
 
-  const setUserActive = useCallback((user, active) => {
-    setUsers((current) =>
-      current.map((item) => (item.id === user.id ? { ...item, active } : item)),
-    );
-    notifyDemo(
-      `${user.name} ${active ? "reactivated" : "deactivated"} in the demo.`,
-    );
-  }, []);
+    try {
+      const response = await adminDepartmentsApi.getAll();
 
-  const saveDepartment = useCallback((id, values) => {
-    if (id) {
-      setDepartments((current) =>
-        current.map((dep) => (dep.id === id ? { ...dep, ...values } : dep)),
-      );
-      notifyDemo("Department updated in the demo.");
-    } else {
-      setDepartments((current) => [
-        ...current,
-        { id: demoId("dep"), ...values },
-      ]);
-      notifyDemo(`${values.name} added to the demo departments.`);
+      setDepartments(mapAdminDepartments(response));
+    } catch (error) {
+      setDepartments([]);
+      setDepartmentsError(error);
+    } finally {
+      setDepartmentsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadDepartments();
+  }, [loadDepartments]);
+
+  const loadUsers = useCallback(async () => {
+    setUsersLoading(true);
+    setUsersError(null);
+
+    try {
+      const response = await adminUsersApi.getUsers();
+
+      setUsers(mapAdminUsers(response));
+    } catch (error) {
+      setUsers([]);
+      setUsersError(error);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, []);
+
+  const addUser = useCallback(
+    async (values) => {
+      const createdUser = await adminUsersApi.createUser(
+        toCreateAdminUserRequest(values),
+      );
+
+      if (values.profileId) {
+        try {
+          await adminUsersApi.assignPermissionProfile(
+            createdUser.id,
+            values.profileId,
+          );
+        } catch (error) {
+          await loadUsers();
+
+          throw new Error(
+            `User ${createdUser.email} was created, but the ` +
+              `permission profile could not be assigned: ${error.message}`,
+          );
+        }
+      }
+
+      await loadUsers();
+
+      toast.success(`${createdUser.displayName} created successfully.`);
+
+      return createdUser;
+    },
+    [loadUsers],
+  );
+
+  const updateUser = useCallback(
+    async (userId, values) => {
+      try {
+        const request = toUpdateAdminUserRequest(values);
+
+        await adminUsersApi.updateUser(userId, request);
+
+        if (
+          !values.multipleProfiles &&
+          values.profileId !== values.originalProfileId
+        ) {
+          // First assign the new profile.
+          if (values.profileId) {
+            await adminUsersApi.assignPermissionProfile(id, values.profileId);
+          }
+
+          // Then remove the previous profile.
+          if (values.originalProfileId) {
+            await adminUsersApi.removePermissionProfile(
+              id,
+              values.originalProfileId,
+            );
+          }
+        }
+
+        await loadUsers();
+
+        toast.success("User updated successfully.");
+      } catch (error) {
+        toast.error(error.message || "Failed to update user.");
+
+        throw error;
+      }
+    },
+    [loadUsers],
+  );
+
+  const setUserActive = useCallback(
+    async (user, isActive) => {
+      await adminUsersApi.updateUserStatus(user.id, isActive);
+
+      await loadUsers();
+
+      toast.success(
+        isActive
+          ? `${user.name} activated successfully.`
+          : `${user.name} deactivated successfully.`,
+      );
+    },
+    [loadUsers],
+  );
+
+  const saveDepartment = useCallback(
+    async (id, values) => {
+      try {
+        const payload = toDepartmentRequest(values);
+
+        if (id) {
+          await adminDepartmentsApi.update(id, payload);
+        } else {
+          await adminDepartmentsApi.create(payload);
+        }
+
+        await loadDepartments();
+
+        toast.success(
+          id
+            ? "Department updated successfully."
+            : "Department created successfully.",
+        );
+      } catch (error) {
+        toast.error(error.message);
+        throw error;
+      }
+    },
+    [loadDepartments],
+  );
+
+  const setDepartmentActive = useCallback(
+    async (id, isActive) => {
+      try {
+        await adminDepartmentsApi.setActive(id, isActive);
+        await loadDepartments();
+
+        toast.success(
+          isActive ? "Department activated." : "Department deactivated.",
+        );
+      } catch (error) {
+        toast.error(error.message);
+        throw error;
+      }
+    },
+    [loadDepartments],
+  );
+
+  const deleteDepartment = useCallback(
+    async (id) => {
+      try {
+        await adminDepartmentsApi.remove(id);
+        await loadDepartments();
+
+        toast.success("Department deleted.");
+      } catch (error) {
+        toast.error(error.message);
+        throw error;
+      }
+    },
+    [loadDepartments],
+  );
 
   const saveProfile = useCallback((id, values) => {
     if (id) {
@@ -147,6 +321,20 @@ export function useAdminWorkspace() {
     notifyDemo("Agreement rules updated for this demo session.");
   }, []);
 
+  const { currentUser, loading: currentUserLoading } = useCurrentUser();
+
+  useEffect(() => {
+    if (currentUserLoading) return;
+
+    if (!currentUser) {
+      setUsers([]);
+      setUsersLoading(false);
+      return;
+    }
+
+    loadUsers();
+  }, [currentUser?.userId, currentUserLoading, loadUsers]);
+
   return useMemo(
     () => ({
       users,
@@ -163,6 +351,14 @@ export function useAdminWorkspace() {
       updateStampAssignments,
       deleteStamp,
       saveAgreementRules,
+      usersLoading,
+      usersError,
+      reloadUsers: loadUsers,
+      departmentsLoading,
+      departmentsError,
+      reloadDepartments: loadDepartments,
+      setDepartmentActive,
+      deleteDepartment,
     }),
     [
       users,
@@ -179,6 +375,14 @@ export function useAdminWorkspace() {
       updateStampAssignments,
       deleteStamp,
       saveAgreementRules,
+      usersLoading,
+      usersError,
+      loadUsers,
+      departmentsLoading,
+      departmentsError,
+      loadDepartments,
+      setDepartmentActive,
+      deleteDepartment,
     ],
   );
 }

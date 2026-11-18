@@ -34,6 +34,7 @@ export function UsersTable({
   users,
   departmentsById,
   profilesById,
+  userProfilesById = {},
   ...handlers
 }) {
   return (
@@ -75,7 +76,11 @@ export function UsersTable({
                 {departmentsById[user.departmentId]?.name ?? "—"}
               </td>
               <td className="px-4 py-3 text-[15px] text-ink-muted">
-                {profilesById[user.profileId]?.name ?? "—"}
+                {userProfilesById[user.id] === null
+                  ? "Unable to load"
+                  : userProfilesById[user.id] === undefined
+                    ? "Loading..."
+                    : userProfilesById[user.id].join(", ") || "—"}
               </td>
               <td className="px-4 py-3">
                 <IdentityBadge identity={user.identity} />

@@ -8,6 +8,7 @@ import {
   UsersSection,
   useAdmin,
 } from "@/features/admin";
+import { adminUsersApi } from "@/features/admin/api/adminUsersApi";
 
 export { AdminLayout };
 
@@ -15,7 +16,8 @@ export { AdminLayout };
  * Thin route screens for the Admin workspace. They render inside
  * <AdminLayout />, which owns the shared demo state (no backend calls).
  */
-
+const users = await adminUsersApi.getUsers();
+console.log(users);
 export function AdminOverviewPage() {
   return <AdminOverview {...useAdmin()} />;
 }

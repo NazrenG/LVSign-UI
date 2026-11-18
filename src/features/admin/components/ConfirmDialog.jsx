@@ -1,12 +1,13 @@
 import { Button, Dialog } from "@/components/ui";
 
-/** Small confirmation for destructive or state-changing actions. */
 export function ConfirmDialog({
   isOpen,
   title,
   message,
   confirmLabel,
   tone = "primary",
+  loading = false,
+  error = null,
   onConfirm,
   onClose,
 }) {
@@ -14,25 +15,32 @@ export function ConfirmDialog({
     <Dialog
       isOpen={isOpen}
       title={title}
-      onClose={onClose}
+      onClose={loading ? undefined : onClose}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" disabled={loading} onClick={onClose}>
             Cancel
           </Button>
+
           <Button
             variant={tone === "danger" ? "danger" : "primary"}
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
+            disabled={loading}
+            onClick={onConfirm}
           >
-            {confirmLabel}
+            {loading ? "Processing..." : confirmLabel}
           </Button>
         </>
       }
     >
-      <div className="space-y-3 text-[15px] text-ink-muted">{message}</div>
+      <div className="space-y-3 text-[15px] text-ink-muted">
+        {message}
+
+        {error && (
+          <p role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+        )}
+      </div>
     </Dialog>
   );
 }

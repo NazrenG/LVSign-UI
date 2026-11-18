@@ -13,21 +13,45 @@ function Row({ label, children }) {
   );
 }
 
-/** Read-only details panel for one user. */
 export function UserDetailsSheet({
   user,
+  loading = false,
+  error = null,
   department,
   profile,
-  stamps,
+  stamps = [],
   onEdit,
   onToggleActive,
   onClose,
 }) {
+  if (loading) {
+    return (
+      <Sheet isOpen title="User details" onClose={onClose}>
+        <p className="p-4 text-sm text-ink-muted">Loading user details...</p>
+      </Sheet>
+    );
+  }
+
+  if (error) {
+    return (
+      <Sheet isOpen title="User details" onClose={onClose}>
+        <p className="p-4 text-sm text-red-600">
+          {error.status === 403
+            ? "You don't have permission to view this user."
+            : error.status === 404
+              ? "User not found."
+              : error.message || "Failed to load user details."}
+        </p>
+      </Sheet>
+    );
+  }
+
   if (!user) return null;
+
   const userStamps = stamps.filter(
     (stamp) =>
       stamp.scope === STAMP_SCOPE.users &&
-      stamp.assignedUserIds.includes(user.id),
+      stamp.assignedUserIds?.includes(user.id),
   );
 
   return (
@@ -49,7 +73,7 @@ export function UserDetailsSheet({
             <IdentityBadge identity={user.identity} />
           </Row>
           <Row label="Department">{department?.name ?? "—"}</Row>
-          <Row label="Permission profile">{profile?.name ?? "—"}</Row>
+          {/* <Row label="Permission profile">{profile?.name ?? "—"}</Row> */}
           <Row label="Added">{formatDayMonthYear(user.addedAt)}</Row>
           <Row label="Assigned stamps">
             {userStamps.length
@@ -59,8 +83,10 @@ export function UserDetailsSheet({
         </dl>
       </div>
 
+      <UserAccessAssignments key={user.id} user={user} />
+
       <p className="mt-3 text-[12px] text-ink-subtle">
-        Microsoft account status is read-only and comes from demo data.
+        Microsoft account linking is managed by your organization administrator.
       </p>
 
       <div className="mt-5 flex flex-col gap-2">

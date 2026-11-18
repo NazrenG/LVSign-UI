@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Dialog, Input, Select, Toggle } from "@/components/ui";
 import { isValidEmail } from "../../adminSelectors";
+import { adminUsersApi } from "../../api/adminUsersApi";
 
 const EMPTY = {
   name: "",
@@ -8,6 +9,7 @@ const EMPTY = {
   departmentId: "",
   profileId: "",
   active: true,
+  jobTitle: "",
 };
 
 function FieldError({ id, children }) {
@@ -31,6 +33,8 @@ export function UserFormDialog({
   profiles,
   onSave,
   onClose,
+  accessProfiles = [],
+  accessProfilesLoading = false,
 }) {
   const isEdit = Boolean(user);
   const [values, setValues] = useState(() =>
@@ -41,14 +45,61 @@ export function UserFormDialog({
           departmentId: user.departmentId,
           profileId: user.profileId,
           active: user.active,
+          jobTitle: user.jobTitle ?? "",
         }
       : {
           ...EMPTY,
           departmentId: departments[0]?.id ?? "",
-          profileId: profiles.at(-1)?.id ?? "",
+          profileId: "",
         },
   );
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  const [profileLoading, setProfileLoading] = useState(isEdit);
+  const [profileError, setProfileError] = useState("");
+  const [originalProfileId, setOriginalProfileId] = useState("");
+  const [multipleProfiles, setMultipleProfiles] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let cancelled = false;
+
+    async function loadProfile() {
+      setProfileLoading(true);
+      setProfileError("");
+
+      try {
+        const assigned = await adminUsersApi.getUserPermissionProfiles(user.id);
+
+        if (cancelled) return;
+
+        setMultipleProfiles(assigned.length > 1);
+
+        if (assigned.length === 1) {
+          const id = assigned[0].permissionProfileId;
+          setOriginalProfileId(id);
+          setValues((current) => ({ ...current, profileId: id }));
+        } else {
+          setOriginalProfileId("");
+          setValues((current) => ({ ...current, profileId: "" }));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setProfileError(error.message || "Unable to load profiles.");
+        }
+      } finally {
+        if (!cancelled) setProfileLoading(false);
+      }
+    }
+
+    loadProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const set = (key) => (value) =>
     setValues((current) => ({ ...current, [key]: value }));
@@ -72,12 +123,29 @@ export function UserFormDialog({
   };
   const hasErrors = Object.values(errors).some(Boolean);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
-    if (hasErrors) return;
-    onSave({ ...values, name: values.name.trim() });
-    onClose();
+    setSaveError(null);
+
+    if (hasErrors || saving) return;
+
+    setSaving(true);
+
+    try {
+    await onSave({
+  ...values,
+  name: values.name.trim(),
+  originalProfileId,
+  multipleProfiles,
+});
+
+      onClose();
+    } catch (error) {
+      setSaveError(error.message || "Failed to save user.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -86,7 +154,7 @@ export function UserFormDialog({
       title={isEdit ? "Edit user" : "Add user"}
       description={
         isEdit
-          ? "Update this employee's details in the demo."
+          ? "Update this employee's information."
           : "The employee signs in with their existing Microsoft work account — no password is set here."
       }
       onClose={onClose}
@@ -95,8 +163,8 @@ export function UserFormDialog({
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" form="admin-user-form">
-            {isEdit ? "Save changes" : "Add user"}
+          <Button type="submit" form="admin-user-form" disabled={saving}>
+            {saving ? "Saving..." : isEdit ? "Save changes" : "Add user"}
           </Button>
         </>
       }
@@ -107,6 +175,11 @@ export function UserFormDialog({
         onSubmit={handleSubmit}
         className="space-y-5"
       >
+        {saveError && (
+          <p role="alert" className="text-sm text-danger">
+            {saveError}
+          </p>
+        )}
         <div>
           <Input
             label={isEdit ? "Display name" : "Full name"}
@@ -137,6 +210,16 @@ export function UserFormDialog({
             aria-invalid={submitted && Boolean(errors.email)}
             aria-describedby="user-email-error"
           />
+
+          <div>
+            <Input
+              label="Job title"
+              value={values.jobTitle ?? ""}
+              onChange={(event) => set("jobTitle")(event.target.value)}
+              placeholder="e.g. System Developer"
+            />
+          </div>
+
           <FieldError id="user-email-error">
             {submitted && errors.email}
           </FieldError>
@@ -147,20 +230,61 @@ export function UserFormDialog({
             label="Department"
             value={values.departmentId}
             onChange={(event) => set("departmentId")(event.target.value)}
-            options={departments.map((dep) => ({
-              value: dep.id,
-              label: dep.name,
-            }))}
+            options={[
+              {
+                value: "",
+                label: "Select department",
+              },
+              ...departments
+                .filter(
+                  (department) =>
+                    department.active ||
+                    (isEdit && department.id === values.departmentId),
+                )
+                .map((department) => ({
+                  value: department.id,
+                  label: department.active
+                    ? department.name
+                    : `${department.name} (Inactive)`,
+                })),
+            ]}
           />
           <Select
             label="Permission profile"
-            value={values.profileId}
+            value={values.profileId ?? ""}
             onChange={(event) => set("profileId")(event.target.value)}
-            options={profiles.map((profile) => ({
-              value: profile.id,
-              label: profile.name,
-            }))}
+            disabled={
+              accessProfilesLoading ||
+              profileLoading ||
+              Boolean(profileError) ||
+              multipleProfiles
+            }
+            options={[
+              {
+                value: "",
+                label: accessProfilesLoading
+                  ? "Loading profiles..."
+                  : "No profile",
+              },
+              ...accessProfiles
+                .filter((profile) => profile.isActive)
+                .map((profile) => ({
+                  value: profile.id,
+                  label: profile.name,
+                })),
+            ]}
           />
+          {profileError && (
+            <p role="alert" className="text-sm text-danger">
+              {profileError}
+            </p>
+          )}
+
+          {multipleProfiles && (
+            <p className="text-sm text-ink-muted">
+              Multiple profiles are assigned. Manage them in User Details.
+            </p>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-4 rounded-md border border-line px-4 py-3">

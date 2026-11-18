@@ -2,140 +2,77 @@ import { useEffect, useState } from "react";
 import { InteractionStatus } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
 import { useNavigate } from "react-router-dom";
+
 import { useCurrentUser } from "@/features/auth/CurrentUserProvider";
 import { AUTH_STATUS } from "@/features/auth/authStatus";
 import { AuthLayout } from "@/features/auth/components/AuthLayout";
 import { MicrosoftSignInPanel } from "@/features/auth/components/MicrosoftSignInPanel";
 import { loginRequest } from "@/features/auth/msalConfig";
-import { authenticatedFetch } from "@/features/auth/authenticatedFetch";
+import { useMicrosoftLogout } from "@/features/auth/useMicrosoftLogout";
 
 export function LoginPage() {
   const { instance, accounts, inProgress } = useMsal();
-  useEffect(() => {
-    console.log("[MSAL] Status:", inProgress);
-    console.log("[MSAL] Account count:", accounts.length);
-    console.log("[MSAL] Active account:", Boolean(instance.getActiveAccount()));
-  }, [instance, accounts, inProgress]);
+  const { currentUser, loading, error } = useCurrentUser();
+
+  const navigate = useNavigate();
+  const signOut = useMicrosoftLogout();
+
   const [errorMessage, setErrorMessage] = useState("");
-  const [tokenReady, setTokenReady] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
 
   const account = instance.getActiveAccount() ?? accounts[0] ?? null;
 
-  const isBusy = inProgress !== InteractionStatus.None;
+  const isBusy = signingIn || inProgress !== InteractionStatus.None;
 
-  const navigate = useNavigate();
-
-  const { currentUser, loading } = useCurrentUser();
-
+  // Microsoft authentication + LV.SignFlow access verified.
   useEffect(() => {
-    if (!loading && currentUser?.userId) {
+    if (!account || loading) return;
+
+    if (currentUser) {
       navigate("/", { replace: true });
-    }
-  }, [currentUser?.userId, loading, navigate]);
-
-  useEffect(() => {
-    if (!account || isBusy) return;
-
-    let cancelled = false;
-
-    async function verifyTokenAcquisition() {
-      try {
-        const result = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account,
-        });
-
-        if (!cancelled) {
-          setTokenReady(Boolean(result.accessToken));
-          setErrorMessage("");
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setTokenReady(false);
-          setErrorMessage(
-            error?.message ?? "Unable to acquire an API access token.",
-          );
-        }
-      }
+      return;
     }
 
-    verifyTokenAcquisition();
+    if (error?.status === 403) {
+      navigate("/access-denied", { replace: true });
+      return;
+    }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [account, instance, isBusy]);
-
-  useEffect(() => {
-    const callbackId = instance.addEventCallback((event) => {
-      if (
-        event.eventType.includes("LOGIN") ||
-        event.eventType.includes("HANDLE_REDIRECT") ||
-        event.eventType.includes("ACQUIRE_TOKEN")
-      ) {
-        console.log("[MSAL EVENT]", event.eventType);
-
-        if (event.error) {
-          console.error(
-            "[MSAL ERROR]",
-            event.error.errorCode,
-            event.error.message,
-          );
-        }
-      }
-    });
-
-    return () => {
-      if (callbackId) {
-        instance.removeEventCallback(callbackId);
-      }
-    };
-  }, [instance]);
+    if (error?.code === "SESSION_EXPIRED") {
+      navigate("/session-expired", { replace: true });
+    }
+  }, [account, loading, currentUser, error, navigate]);
 
   const handleSignIn = async () => {
+    if (isBusy) return;
+
     setErrorMessage("");
+    setSigningIn(true);
 
     try {
-      const result = await instance.loginPopup(loginRequest);
+      // Always show Microsoft account selection.
+      const result = await instance.loginPopup({
+        ...loginRequest,
+        prompt: "select_account",
+      });
 
       if (!result.account) {
-        throw new Error(
-          "Microsoft authentication completed without an account.",
-        );
-      }
-      const response = await authenticatedFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/me`,
-      );
-
-      console.log("[Auth Me] Status:", response.status);
-
-      if (response.ok) {
-        const currentUser = await response.json();
-
-        console.log(
-          "[Auth Me] Internal User ID available:",
-          Boolean(currentUser.userId),
-        );
+        throw new Error("Microsoft did not return an account.");
       }
 
+      // IMPORTANT: establish the selected account first.
       instance.setActiveAccount(result.account);
 
-      console.log("[MSAL] Login popup succeeded");
-      console.log("[MSAL] Account count:", instance.getAllAccounts().length);
-      console.log(
-        "[MSAL] API access token received:",
-        Boolean(result.accessToken),
-      );
-    } catch (error) {
-      console.error(
-        "[MSAL] Login failed:",
-        error?.errorCode ?? error?.name,
-        error?.message,
-      );
+      // CurrentUserProvider performs /api/auth/me verification.
+      // No duplicated API request here.
+    } catch (err) {
+      console.error("[MSAL LOGIN ERROR]", err);
 
       setErrorMessage(
-        error?.message ?? "Microsoft sign-in could not be completed.",
+        err?.message ?? "Microsoft sign-in could not be completed.",
       );
+    } finally {
+      setSigningIn(false);
     }
   };
 
@@ -150,20 +87,42 @@ export function LoginPage() {
       <h1 className="font-serif text-4xl text-ink">Welcome to LV Sign</h1>
 
       <p className="mt-3 mb-8 text-[15px] text-ink-muted">
-        Sign in securely with your LV Logistics work account.
+        Sign in securely with your Microsoft account.
       </p>
 
-      <MicrosoftSignInPanel
-        status={status}
-        errorMessage={errorMessage}
-        onSignIn={handleSignIn}
-        onRetry={handleSignIn}
-      />
-      {account && tokenReady && (
-        <p className="mt-4 text-sm text-ink-muted" role="status">
-          Microsoft sign-in completed. LV Sign access verification is not
-          connected yet.
-        </p>
+      {account ? (
+        <div className="space-y-4 rounded-lg border border-line bg-surface p-6">
+          <p className="text-sm text-ink-muted">Microsoft account:</p>
+
+          <p className="font-medium text-ink break-all">{account.username}</p>
+
+          {loading ? (
+            <p>Verifying LV.SignFlow access...</p>
+          ) : error ? (
+            <p role="alert" className="text-sm text-danger">
+              {error.status === 403
+                ? "Your Microsoft account is not authorized."
+                : error.message}
+            </p>
+          ) : (
+            <p>Checking your account...</p>
+          )}
+
+          <button
+            type="button"
+            onClick={signOut}
+            className="w-full rounded-md border border-line px-4 py-3 text-sm font-medium"
+          >
+            Sign out / Use another account
+          </button>
+        </div>
+      ) : (
+        <MicrosoftSignInPanel
+          status={status}
+          errorMessage={errorMessage}
+          onSignIn={handleSignIn}
+          onRetry={handleSignIn}
+        />
       )}
     </AuthLayout>
   );
